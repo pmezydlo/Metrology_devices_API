@@ -28,6 +28,6 @@ CREATE TABLE logs
 INSERT INTO logs VALUES (default, default, default, 'Create base');
 INSERT INTO logs VALUES (default, default, default, 'Wszysko dziala');
 
-INSERT INTO devices VALUES (default, 'osc1', 'RIGOL', '', '', '', '192.168.15.20', 5555, FALSE);
-INSERT INTO devices VALUES (default, 'mul3', 'HP', '', '', '', '192.168.15.20', 5555, FALSE);
-INSERT INTO devices VALUES (default, 'analiz', 'KEYSIGHT', '', '', '', '192.168.15.20', 5555, FALSE);
+INSERT INTO devices VALUES (default, 'osc1', 'RIGOL', '', '', '', '192.168.20.15', 5555, FALSE);
+INSERT INTO devices VALUES (default, 'mul3', 'HP', '', '', '', '192.168.20.15', 5555, FALSE);
+INSERT INTO devices VALUES (default, 'analiz', 'KEYSIGHT', '', '', '', '192.168.20.15', 5555, FALSE);
