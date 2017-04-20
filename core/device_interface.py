@@ -1,5 +1,7 @@
 import sys
+import threading
 from telnetlib_receive_all import Telnet
+import time
 
 class lan(object):
     def __init__(self, lan_ip, lan_port):
@@ -31,9 +33,8 @@ class lan(object):
         self.tn.close()
 
 class dev_core (threading.Thread):
-    def __init__ (self, threadID, dev_id, own_dev_name, lan_ip, lan_port):
+    def __init__ (self,  dev_id, own_dev_name, lan_ip, lan_port):
         threading.Thread.__init__(self)
-        self.threadID = threadID
         self.dev = None
         self.name = own_dev_name
         self.dev_id = dev_id
@@ -41,11 +42,11 @@ class dev_core (threading.Thread):
         self.lan_port = lan_port
         self.dev = lan(self.lan_ip, self.lan_port)
 
-    def dev_run(self):
+    def run(self):
         counter = 5
-        delay = self.threadID;
+        delay = self.dev_id
         while counter:
-            print threadID 
+
             id = self.dev.read("*IDN?")
 
             if id == "command_error":
@@ -54,7 +55,7 @@ class dev_core (threading.Thread):
 
             ids = id.split(',')
     
-            print ids
+            print('ID: {} name: {} mes:{}'.format(self.dev_id, self.name, id))
 
             self.manufacturer = ids[0]
             self.dev_name = ids[1]
@@ -62,6 +63,9 @@ class dev_core (threading.Thread):
             self.firmware_version = ids[3]
             time.sleep(delay)
             counter -= 1
+
+    def push_status(self, base_connect):
+        pass
 
     def dev_exit():
         pass
