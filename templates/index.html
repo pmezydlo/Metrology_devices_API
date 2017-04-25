@@ -1,0 +1,51 @@
+<!doctype html>
+<html ng-app="myApp">
+    <head> 
+
+	<link rel="stylesheet" href="/static/css/style.css" />
+    </head>
+    <body ng-controller="mainController">
+
+        <div class="dev_list">
+            <h1>List of device</h1>
+    
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Own name</th>
+                    <th>Manufacturer</th>
+                    <th>Name</th>
+                    <th>Serial</th>
+                    <th>Firmware</th>
+                    <th>IP</th>
+                    <th>Port</th>
+                    <th>Active</th>
+                </tr>
+                <tr ng-repeat="dev in devData">
+                    <td> {% raw %}dev.id {% endraw %} </td>
+                    <td> {% raw %}dev.own_name {% endraw %}</td>
+                    <td> {% raw %}dev.manufacturer {% endraw %}</td>
+                    <td> {% raw %}dev.name  {% endraw %}</td>
+                    <td> {% raw %}dev.serial_nr {% endraw %} </td>
+                    <td> {% raw %}dev.firmware_ver{% endraw %} </td>
+                    <td> {% raw %}dev.lan_address {% endraw %}</td>
+                    <td> {% raw %}dev.lan_port {% endraw %}</td>
+                    <td> {% raw %}dev.active {% endraw %}</td>
+                    <td><button ng-click="deleteDev(dev.id)">Delete</button></td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="dev_form">
+            <h1>Add new device</h1>
+            Own name:<br><input type="text" placeholder="own name" ng-model="formData.own_name"><br>
+            IP:<br><input type="text" placeholder="lan address" ng-model="formData.lan_address"><br>
+            Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
+            <br><button type="submit" ng-click="createDev()">Submit</button>
+        </dev>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+	<script src="http://code.angularjs.org/1.5.3/angular-route.min.js"></script>
+        <script src="/static/js/app.js"></script>
+    </body>
+</html>

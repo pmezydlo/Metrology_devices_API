@@ -22,6 +22,9 @@ class psql_connection(object):
         finally:
             print "all is ok"
 
+    def psql_print(self, dev_name):
+        print('data_base_request from thread: {} addres:{}'.format(dev_name, hex(id(object))))
+   
     def psql_disconnect(self):
         self.connect.close()
 
@@ -35,4 +38,18 @@ class psql_connection(object):
         except:
             print "database error select"
             sys.exit(1)
+
+    def get_device_json(self):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+            cur.execute("SELECT  id, own_name, lan_address, lan_port FROM devices")           
+            r = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+            return (r[0] if r else None) if one else r
+
+        except:
+            print "database error select"
+            sys.exit(1)
+
 

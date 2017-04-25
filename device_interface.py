@@ -33,7 +33,7 @@ class lan(object):
         self.tn.close()
 
 class dev_core (threading.Thread):
-    def __init__ (self,  dev_id, own_dev_name, lan_ip, lan_port):
+    def __init__ (self, dev_id, own_dev_name, lan_ip, lan_port):
         threading.Thread.__init__(self)
         self.dev = None
         self.name = own_dev_name
