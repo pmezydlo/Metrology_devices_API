@@ -3,15 +3,15 @@ import time
 import os
 import psycopg2
 import psycopg2.extras
+import json
 
 class psql_connection(object):
-    def __init__ (self, database, user, password, host):
+    def __init__ (self, database, user, host, password):
         self.connect = None 
         self.database = database
         self.user = user
-        self.password = password
         self.host = host
-
+        self.password = password
         try:
             self.database = database
             self.user = user
@@ -22,34 +22,38 @@ class psql_connection(object):
         finally:
             print "all is ok"
 
-    def psql_print(self, dev_name):
-        print('data_base_request from thread: {} addres:{}'.format(dev_name, hex(id(object))))
-   
     def psql_disconnect(self):
         self.connect.close()
 
     def get_device_list(self):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cur.execute("SELECT  id, own_name, lan_address, lan_port FROM devices")
-            
+            cur.execute("SELECT * FROM devices")
+            cur.close()
             return cur.fetchall()
 
         except:
             print "database error select"
-            sys.exit(1)
 
-    def get_device_json(self):
+    def get_devices_list_json(self):
         try: 
-            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-            cur.execute("SELECT  id, own_name, lan_address, lan_port FROM devices")           
-            r = [dict((cur.description[i][0], value) \
-                for i, value in enumerate(row)) for row in cur.fetchall()]
-            return (r[0] if r else None) if one else r
-
+            cur.execute("""SELECT  * FROM devices""")      
+            
+            return json.dumps(cur.fetchall()) 
         except:
             print "database error select"
-            sys.exit(1)
+
+
+    def add_device_json(self, json_data):
+        try:
+            data = json.loads(json_data)
+            cur = self.connect.cursor()
+            cur.execute("INSERT INTO devices(own_name, lan_address, lan_port) VALUES (%s, %s, %s)", (data['own_name'], data['lan_address'], data['lan_port']))
+            self.connect.commit()
+        except:
+            print "database error insert"
+
 
 

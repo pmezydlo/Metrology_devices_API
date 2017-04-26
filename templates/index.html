@@ -7,8 +7,6 @@
     <body ng-controller="mainController">
 
         <div class="dev_list">
-            <h1>List of device</h1>
-    
             <table>
                 <tr>
                     <th>ID</th>
@@ -21,22 +19,22 @@
                     <th>Port</th>
                     <th>Active</th>
                 </tr>
+                {% raw %}
                 <tr ng-repeat="dev in devData">
-                    <td> {% raw %}dev.id {% endraw %} </td>
-                    <td> {% raw %}dev.own_name {% endraw %}</td>
-                    <td> {% raw %}dev.manufacturer {% endraw %}</td>
-                    <td> {% raw %}dev.name  {% endraw %}</td>
-                    <td> {% raw %}dev.serial_nr {% endraw %} </td>
-                    <td> {% raw %}dev.firmware_ver{% endraw %} </td>
-                    <td> {% raw %}dev.lan_address {% endraw %}</td>
-                    <td> {% raw %}dev.lan_port {% endraw %}</td>
-                    <td> {% raw %}dev.active {% endraw %}</td>
+                    <td> {{dev.id}}</td>
+                    <td> {{dev.own_name}}</td>
+                    <td> {{dev.manufacturer}}</td>
+                    <td> {{dev.name}}</td>
+                    <td> {{dev.serial_nr}}</td>
+                    <td> {{dev.firmware_ver}} </td>
+                    <td> {{dev.lan_address}}</td>
+                    <td> {{dev.lan_port}}</td>
+                    <td> {{dev.active}}</td>
                     <td><button ng-click="deleteDev(dev.id)">Delete</button></td>
-                </tr>
+                    {% endraw %}</tr>
             </table>
         </div>
-
-
+                
         <div class="dev_form">
             <h1>Add new device</h1>
             Own name:<br><input type="text" placeholder="own name" ng-model="formData.own_name"><br>
