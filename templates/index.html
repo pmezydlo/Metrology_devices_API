@@ -1,7 +1,9 @@
 <!doctype html>
 <html ng-app="myApp">
     <head> 
-
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+	<script src="http://code.angularjs.org/1.5.3/angular-route.min.js"></script>
+        <script src="/static/js/app.js"></script>
 	<link rel="stylesheet" href="/static/css/style.css" />
     </head>
     <body ng-controller="mainController">
@@ -18,6 +20,9 @@
                     <th>IP</th>
                     <th>Port</th>
                     <th>Active</th>
+                    <th></th>
+                    <th>Status</th>
+                    <th></th>
                 </tr>
                 {% raw %}
                 <tr ng-repeat="dev in devData">
@@ -29,9 +34,13 @@
                     <td> {{dev.firmware_ver}} </td>
                     <td> {{dev.lan_address}}</td>
                     <td> {{dev.lan_port}}</td>
-                    <td> {{dev.active}}</td>
-                    <td><button ng-click="deleteDev(dev.id)">Delete</button></td>
-                    {% endraw %}</tr>
+                    <td> {{dev.active}}</td> {% endraw %}
+                    <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
+                    <td> {% raw %} {{dev.status}} {% endraw %} </td>
+                    <td><button type="submit" ng-click="actDev(dev.id)">{% raw %} {{newStatus}} {% endraw %}</button></td>
+                    
+
+                </tr>
             </table>
         </div>
                 
@@ -42,8 +51,31 @@
             Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
             <br><button type="submit" ng-click="createDev()">Submit</button>
         </dev>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
-	<script src="http://code.angularjs.org/1.5.3/angular-route.min.js"></script>
-        <script src="/static/js/app.js"></script>
+
+
+        <div class="system_logs">
+            <h1>System logs</h1>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+		    <th>Type</th>
+                    <th>Message</th>
+                </tr>    {% raw %}
+                <tr ng-repeat="log in logsData">
+                    <td> {{log.id}}  </td>
+                    <td> {{log.log_date}} </td>
+                    <td> {{log.log_time}} </td>
+		    <td> {{log.log_type}}
+                    <td> {{log.log_msg}}  </td>
+                </tr>       {% endraw %}
+            </table>
+            <br><button type="submit" ng-click="deleteLogs()">Delete logs</button>
+        </div>
+
+
+
+
     </body>
 </html>

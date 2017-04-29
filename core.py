@@ -5,14 +5,14 @@ import time
 from psql_interface import psql_connection
 from device_interface import dev_core
 
-class core(threading.Thread):
+ class core(threading.Thread):
     def __init__ (self, base_name, base_user, base_password, base_host):
         threading.Thread.__init__(self)
 
         self.device_list = []
         self.device_thread_list = []
 
-        self.base = psql_connection(base_name, base_user, base_password, base_host)
+       self.base = psql_connection(base_name, base_user, base_password, base_host)
 
     def run(self):
         def get_device_list():
@@ -55,14 +55,5 @@ class core(threading.Thread):
         core_release()
 
 def main():
-    name = "measure_device_base"
-    user = "postgres"
-    password = "postgres"
-    host = "localhost"
-
-    c = core(name, user, password, host)
-    c.start()
-    c.join()
-
 if __name__ == "__main__":
     main()

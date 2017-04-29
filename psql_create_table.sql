@@ -3,6 +3,7 @@ SET DATESTYLE TO 'SQL';
 
 DROP TABLE devices CASCADE;
 DROP TABLE logs CASCADE;
+DROP TYPE log_typess;
 
 CREATE TABLE devices
 (
@@ -17,16 +18,20 @@ CREATE TABLE devices
     active	    boolean
 );
 
+CREATE TYPE log_typess AS ENUM ('log', 'warning', 'error');
+
 CREATE TABLE logs
 (
     id              SERIAL PRIMARY KEY,
-    log_date        date default current_date,
-    log_time        time default current_time,    
-    message         char(255)
+    log_date        char(8),
+    log_time        char(8),
+    log_type        log_typess,
+    log_msg         char(25)
 );
 
-INSERT INTO logs VALUES (default, default, default, 'Create base');
-INSERT INTO logs VALUES (default, default, default, 'Wszysko dziala');
+
+INSERT INTO logs VALUES (default, '12.02.11', '23:12:21', 'log', 'Create base');
+INSERT INTO logs VALUES (default,  '21.12.16', '23:12:12', 'error', 'type error test');
 
 INSERT INTO devices VALUES (default, 'osc1', 'RIGOL', '', '', '', '192.168.20.15', 5555, FALSE);
 INSERT INTO devices VALUES (default, 'mul3', 'HP', '', '', '', '192.168.20.15', 5555, FALSE);
