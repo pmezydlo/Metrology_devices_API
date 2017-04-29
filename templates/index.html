@@ -7,75 +7,11 @@
 	<link rel="stylesheet" href="/static/css/style.css" />
     </head>
     <body ng-controller="mainController">
-
-        <div class="dev_list">
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Own name</th>
-                    <th>Manufacturer</th>
-                    <th>Name</th>
-                    <th>Serial</th>
-                    <th>Firmware</th>
-                    <th>IP</th>
-                    <th>Port</th>
-                    <th>Active</th>
-                    <th></th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-                {% raw %}
-                <tr ng-repeat="dev in devData">
-                    <td> {{dev.id}}</td>
-                    <td> {{dev.own_name}}</td>
-                    <td> {{dev.manufacturer}}</td>
-                    <td> {{dev.name}}</td>
-                    <td> {{dev.serial_nr}}</td>
-                    <td> {{dev.firmware_ver}} </td>
-                    <td> {{dev.lan_address}}</td>
-                    <td> {{dev.lan_port}}</td>
-                    <td> {{dev.active}}</td> {% endraw %}
-                    <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
-                    <td> {% raw %} {{dev.status}} {% endraw %} </td>
-                    <td><button type="submit" ng-click="actDev(dev.id)">{% raw %} {{newStatus}} {% endraw %}</button></td>
-                    
-
-                </tr>
-            </table>
-        </div>
-                
-        <div class="dev_form">
-            <h1>Add new device</h1>
-            Own name:<br><input type="text" placeholder="own name" ng-model="formData.own_name"><br>
-            IP:<br><input type="text" placeholder="lan address" ng-model="formData.lan_address"><br>
-            Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
-            <br><button type="submit" ng-click="createDev()">Submit</button>
-        </dev>
-
-
-        <div class="system_logs">
-            <h1>System logs</h1>
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-		    <th>Type</th>
-                    <th>Message</th>
-                </tr>    {% raw %}
-                <tr ng-repeat="log in logsData">
-                    <td> {{log.id}}  </td>
-                    <td> {{log.log_date}} </td>
-                    <td> {{log.log_time}} </td>
-		    <td> {{log.log_type}}
-                    <td> {{log.log_msg}}  </td>
-                </tr>       {% endraw %}
-            </table>
-            <br><button type="submit" ng-click="deleteLogs()">Delete logs</button>
-        </div>
-
-
-
-
+        <h1>Metrology device</h1>
+        <a href="/#/">home page</a>
+        <a href="/#/log">log page</a>
+	<a href="/#/dev">dev page</a>
+        <hr>
+        <div ng-view></div>
     </body>
 </html>

@@ -4,6 +4,23 @@ var myApp = angular.module('myApp', [
  'ngRoute',
 ]);
 
+myApp.config(['$routeProvider',
+    function($routeProvider) {
+        $routeProvider.
+            when('/', {
+                templateUrl: '/static/partials/index.html',
+            }).
+            when('/dev', {
+                templateUrl: '../static/partials/dev_page.html',
+            }).
+            when('/log', {
+                templateUrl: '../static/partials/log_page.html',
+            }).
+            otherwise({
+                redirectTo: '/'
+            });
+        }]);
+
 myApp.controller('mainController', ($scope, $http) => {
 
     $scope.formData = {};

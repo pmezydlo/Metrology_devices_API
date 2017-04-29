@@ -1,0 +1,44 @@
+       <div class="dev_list">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Own name</th>
+                    <th>Manufacturer</th>
+                    <th>Name</th>
+                    <th>Serial</th>
+                    <th>Firmware</th>
+                    <th>IP</th>
+                    <th>Port</th>
+                    <th>Active</th>
+                    <th></th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+    
+                <tr ng-repeat="dev in devData">
+                    <td> {{dev.id}}</td>
+                    <td> {{dev.own_name}}</td>
+                    <td> {{dev.manufacturer}}</td>
+                    <td> {{dev.name}}</td>
+                    <td> {{dev.serial_nr}}</td>
+                    <td> {{dev.firmware_ver}} </td>
+                    <td> {{dev.lan_address}}</td>
+                    <td> {{dev.lan_port}}</td>
+                    <td> {{dev.active}}</td>
+                    <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
+                    <td> {{dev.status}} </td>
+                    <td><button type="submit" ng-click="actDev(dev.id)">{{newStatus}}</button></td>
+                    
+
+                </tr>
+            </table>
+        </div>
+                
+        <div class="dev_form">
+            <h1>Add new device</h1>
+            Own name:<br><input type="text" placeholder="own name" ng-model="formData.own_name"><br>
+            IP:<br><input type="text" placeholder="lan address" ng-model="formData.lan_address"><br>
+            Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
+            <br><button type="submit" ng-click="createDev()">Submit</button>
+        </dev>
+
