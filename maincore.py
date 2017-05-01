@@ -5,15 +5,14 @@ import time
 from psql_interface import psql_connection
 from device_interface import dev_core
 
- class core(threading.Thread):
+class maincore(threading.Thread):
     def __init__ (self, base_name, base_user, base_password, base_host):
         threading.Thread.__init__(self)
 
         self.device_list = []
         self.device_thread_list = []
 
-       self.base = psql_connection(base_name, base_user, base_password, base_host)
-
+      #  self.base = psql_connection(base_name, base_user, base_host, base_password)
     def run(self):
         def get_device_list():
             self.device_list = self.base.get_device_list()
@@ -21,9 +20,9 @@ from device_interface import dev_core
         def add_new_device():
             for row_device_list in self.device_list:
                 # if want to add new device 
-                    dev = dev_core(row_device_list["id"], row_device_list["own_name"], row_device_list["lan_address"], row_device_list["lan_port"])  
-                    self.device_thread_list.append(dev)
-                    dev.start()
+                dev = dev_core(row_device_list["id"], row_device_list["own_name"], row_device_list["lan_address"], row_device_list["lan_port"])  
+                self.device_thread_list.append(dev)
+                dev.start()
 
         def ping_device():
             pass
@@ -38,22 +37,18 @@ from device_interface import dev_core
 
             self.base.psql_disconnect()
         
-        get_device_list()
-        add_new_device()
+        #get_device_list()
+        #add_new_device()
         # the main thread loop
         counter = 4
         while counter:
             print counter
 
-            get_device_list()
+         #   get_device_list()
 
-            print_device_list()
+        #    print_device_list()
 
             time.sleep(1)
             counter -= 1
-
-        core_release()
-
-def main():
-if __name__ == "__main__":
-    main()
+            
+       # core_release()

@@ -4,8 +4,10 @@ import json
 import threading
 import time
 import sys 
+
 from psql_interface import psql_connection
 from device_interface import dev_core
+from maincore import maincore
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -38,6 +40,11 @@ def act_device(dev_id):
         
     return 200 
 
+@app.route('/api/sysStop', methods=['POST'])
+def sysStop():
+    print "sysstop"
+    return 'ok status'
+
 @app.route("/api/logs", methods=['GET', 'DELETE'])
 def get_logs():
     if request.method == 'DELETE':
@@ -49,16 +56,9 @@ def index():
     return render_template("index.html")
 
 def main():
-    pass
-
-if __name__ == "__main__":
+    core = maincore(name, user, password, host)
+    core.start()
     app.run(threaded=True)
+    core.join()
+if __name__ == "__main__":
     main()
-
-
-# how to run your own code in flask
-# update angular script for each server running
-# static angular js script
-# flask and thread how it works
-# add async request to server with angular
-

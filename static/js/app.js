@@ -10,6 +10,9 @@ myApp.config(['$routeProvider',
             when('/', {
                 templateUrl: '/static/partials/index.html',
             }).
+            when('/sys', {
+                templateUrl: '../static/partials/sys_page.html',
+            }).
             when('/dev', {
                 templateUrl: '../static/partials/dev_page.html',
             }).
@@ -42,6 +45,16 @@ myApp.controller('mainController', ($scope, $http) => {
         .success((data) => {
             $scope.formData = {};
             $scope.devData = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
+    $scope.sysStop = () => {
+        $http.post('/api/sysStop')
+        .success((data) => {
             console.log(data);
         })
         .error((error) => {

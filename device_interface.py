@@ -47,20 +47,21 @@ class dev_core (threading.Thread):
         delay = self.dev_id
         while counter:
 
-            id = self.dev.read("*IDN?")
+            #id = self.dev.read("*IDN?")
 
-            if id == "command_error":
-                print('No response from device')
-                sys.exit("ERROR")
+            #if id == "command_error":
+             #   print('No response from device')
+              #  sys.exit("ERROR")
 
-            ids = id.split(',')
+            #ids = id.split(',')
     
-            print('ID: {} name: {} mes:{}'.format(self.dev_id, self.name, id))
+            #print('ID: {} name: {} mes:{}'.format(self.dev_id, self.name, id))
 
-            self.manufacturer = ids[0]
-            self.dev_name = ids[1]
-            self.serial_number = ids[2]
-            self.firmware_version = ids[3]
+            #self.manufacturer = ids[0]
+            #self.dev_name = ids[1]
+           # self.serial_number = ids[2]
+            #self.firmware_version = ids[3]
+            print 5
             time.sleep(delay)
             counter -= 1
 
