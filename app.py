@@ -12,12 +12,12 @@ from maincore import maincore
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['DEBUG'] = True
-
-device_thread_list = []
+core = maincore()
 name = "measure_device_base"
 user = "pmezydlo"
 host = "localhost"
 password = "pass"
+
 base = psql_connection(name, user, host, password)
 
 @app.route('/api/dev', methods=['POST', 'GET'])
@@ -42,7 +42,7 @@ def act_device(dev_id):
 
 @app.route('/api/sysStop', methods=['POST'])
 def sysStop():
-    print "sysstop"
+    core.status = 0
     return 'ok status'
 
 @app.route("/api/logs", methods=['GET', 'DELETE'])
@@ -55,10 +55,13 @@ def get_logs():
 def index():
     return render_template("index.html")
 
+@app.before_first_request
+def active_core():
+    pass#core.start()
+
 def main():
-    core = maincore(name, user, password, host)
-    core.start()
-    app.run(threaded=True)
-    core.join()
+    app.run()
+
 if __name__ == "__main__":
     main()
+

@@ -19,6 +19,9 @@ myApp.config(['$routeProvider',
             when('/log', {
                 templateUrl: '../static/partials/log_page.html',
             }).
+            when('/task', {
+                templateUrl: '../static/partials/task_page.html',
+            }).
             otherwise({
                 redirectTo: '/'
             });
