@@ -9,8 +9,6 @@
                     <th>Firmware</th>
                     <th>IP</th>
                     <th>Port</th>
-                    <th>Active</th>
-                    <th></th>
                     <th>Status</th>
                     <th></th>
                 </tr>
@@ -24,12 +22,8 @@
                     <td> {{dev.firmware_ver}} </td>
                     <td> {{dev.lan_address}}</td>
                     <td> {{dev.lan_port}}</td>
-                    <td> {{dev.active}}</td>
+                    <td> {{dev.status}}</td>
                     <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
-                    <td> {{dev.status}} </td>
-                    <td><button type="submit" ng-click="actDev(dev.id)">{{newStatus}}</button></td>
-                    
-
                 </tr>
             </table>
         </div>

@@ -12,7 +12,6 @@ from maincore import maincore
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['DEBUG'] = True
-core = maincore()
 name = "measure_device_base"
 user = "pmezydlo"
 host = "localhost"
@@ -24,25 +23,27 @@ base = psql_connection(name, user, host, password)
 def add_device():
     if request.method == 'POST':
         base.add_device_json(request.data)   
-        base.push_log_msg('add new device', 'log')
     return base.get_devices_list_json()
+
+@app.route('/api/task', methods=['POST', 'GET'])
+def add_task():
+    if request.method == 'POST':
+        base.add_task_json(request.data)
+    return base.get_tasks_list_json()
 
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
 def del_device(dev_id):
     base.del_device_by_id(dev_id)
     return base.get_devices_list_json()
 
-@app.route("/api/dev/act/<dev_id>", methods=['POST'])
-def act_device(dev_id):
-    if request.method == 'POST':
-        print "act device"
-        print request.data
-        
-    return 200 
-
-@app.route('/api/sysStop', methods=['POST'])
+@app.route('/api/sys/stop', methods=['POST'])
 def sysStop():
-    core.status = 0
+    print "stop"
+    return 'ok status'
+
+@app.route('/api/sys/start', methods=['POST'])
+def sysStart():
+    print "start"
     return 'ok status'
 
 @app.route("/api/logs", methods=['GET', 'DELETE'])
@@ -57,7 +58,7 @@ def index():
 
 @app.before_first_request
 def active_core():
-    pass#core.start()
+    pass
 
 def main():
     app.run()

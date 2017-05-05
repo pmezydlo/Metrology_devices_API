@@ -32,7 +32,19 @@ myApp.controller('mainController', ($scope, $http) => {
     $scope.formData = {};
     $scope.devData = {};
     $scope.newStatus = 'RUN';
-    $scope.logsData = {}
+    $scope.logsData = {};
+
+    $scope.taskData = {};
+    $scope.taskFormData = {};
+
+    $http.get('/api/task')
+    .success((data) => {
+        $scope.taskData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
 
     $http.get('/api/dev')
     .success((data) => {
@@ -55,8 +67,20 @@ myApp.controller('mainController', ($scope, $http) => {
         });
     };
 
+    $scope.createTask = () => {
+        $http.post('/api/task', $scope.taskFormData)
+        .success((data) => {
+            $scope.taskFormData = {};
+            $scope.taskData = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
     $scope.sysStop = () => {
-        $http.post('/api/sysStop')
+        $http.post('/api/sys/stop')
         .success((data) => {
             console.log(data);
         })
@@ -65,10 +89,9 @@ myApp.controller('mainController', ($scope, $http) => {
         });
     };
 
-    $scope.actDev = (devID) => {
-        $http.post('/api/dev/act/'+devID, $scope.newStatus)
+    $scope.sysStart = () => {
+        $http.post('/api/sys/start')
         .success((data) => {
-            $scope.newStatus = data;
             console.log(data);
         })
         .error((error) => {

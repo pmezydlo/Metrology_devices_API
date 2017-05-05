@@ -52,6 +52,7 @@ class maincore(threading.Thread):
         self.status = 1
 
     def run(self):      
+        self.status = 1
         while (self.status == 1):
             time.sleep(1)
             print self.status

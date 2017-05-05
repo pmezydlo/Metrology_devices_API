@@ -80,7 +80,7 @@ class psql_connection(object):
         try:
             data = json.loads(json_data)
             cur = self.connect.cursor()
-            cur.execute("INSERT INTO devices(own_name, lan_address, lan_port) VALUES (%s, %s, %s)", (data['own_name'], data['lan_address'], data['lan_port']))
+            cur.execute("INSERT INTO devices VALUES (default, %s, %s, %s)", (data['own_name'], data['lan_address'], data['lan_port']))
             self.connect.commit()
             cur.close()
         except:
@@ -94,4 +94,28 @@ class psql_connection(object):
             cur.close()
         except:
             print "database error delete"
+
+    def get_tasks_list_json(self):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            cur.execute("SELECT  * FROM tasks")      
+            ret = cur.fetchall()
+            cur.close()
+            return json.dumps(ret) 
+        except:
+            print "database error select"
+
+    def add_task_json(self, json_data):
+        try:
+            data = json.loads(json_data)
+            cur = self.connect.cursor()
+            print json_data
+            cur.execute("INSERT INTO tasks VALUES (default, %s, %s, %s, %s)", (data['task_name'], data['task_date'], data['task_time'], data['task_msg']))
+            
+            self.connect.commit()
+            cur.close()
+        except:
+            print "database error insert"
+
 
