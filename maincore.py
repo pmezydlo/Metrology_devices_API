@@ -3,41 +3,54 @@
 import threading
 import time
 from psql_interface import psql_connection
-from device_interface import dev_core
+from task_interface import task_core
+import datetime
 
 class maincore(threading.Thread):
     def __init__ (self, base_name, base_user, base_password, base_host):
         threading.Thread.__init__(self)
 
-        self.devices_thread_list = []
+        self.tasks_thread_list = []
         self.base = psql_connection(base_name, base_user, base_host, base_password)
 
     def run(self):
-        def add_new_device():
-            dev_list = self.base.get_noready_device_list()
-            for dev in dev_list:
-                dev_thread = 0
-                print dev["status"]
+        def add_task_to_execute():
+            dt = datetime.datetime.now()
+            d = dt.strftime("%d.%m.%y")
+            t = dt.strftime("%H:%M:%S")
+            task_list = self.base.get_pending_task(d, t)
+            print task_list
+            print d
+            print t
+            print "==========="
+            for task in task_list:
+                task_thread = 0
+                print task["status"]
                 try:
-                    dev_thread = dev_core(dev["id"], dev["own_name"], dev["lan_address"], dev["lan_port"]) 
-                    dev_thread.start()
+                    dev = self.base.get_device_by_id(task["dev"])
+                    task_thread = task_core(task["id"], task["name"], dev[0]["lan_address"], dev[0]["lan_port"]) 
+                    task_thread.start()
                 except:
                     print "register new thread error"
                 else:
                     print "register thread ok"
-                    self.devices_thread_list.append(dev_thread)
-                    self.base.update_device_status(dev["id"], 'READY')
+                    self.tasks_thread_list.append(task_thread)
+                    self.base.update_task_status(task["id"], 'RUN')
 
         def core_release():
-            for dev_th in self.devices_thread_list:
-                dev_th.join()
+            for task_th in self.tasks_thread_list:
+                task_th.join()
             self.base.psql_disconnect()
 
-        add_new_device()
-        core_release()
-        counter = 1
+        #add_new_device()
+        #transmit_task()
+        #core_release()
+
+        counter = 400
         while counter:
-            time.sleep(1)
-            print counter
+            add_task_to_execute()           
+            #print('{}.{}.{}'.format(dt.day, dt.month, dt.year))
+            #print dt.hour + ":" + dt.minute + ":" + dt.second
+            time.sleep(0.5)
             counter -= 1
 

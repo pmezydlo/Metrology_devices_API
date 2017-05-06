@@ -10,10 +10,10 @@
                 </tr>
                 <tr ng-repeat="log in logsData">
                     <td> {{log.id}}  </td>
-                    <td> {{log.log_date}} </td>
-                    <td> {{log.log_time}} </td>
-		    <td> {{log.log_type}}
-                    <td> {{log.log_msg}}  </td>
+                    <td> {{log.date}} </td>
+                    <td> {{log.time}} </td>
+		    <td> {{log.type}}
+                    <td> {{log.msg}}  </td>
                 </tr>
             </table>
             <br><button type="submit" ng-click="deleteLogs()">Delete logs</button>

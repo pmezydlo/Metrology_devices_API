@@ -6,12 +6,11 @@ import time
 import sys 
 
 from psql_interface import psql_connection
-from device_interface import dev_core
 from maincore import maincore
 
 app = Flask(__name__)
-app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config['DEBUG'] = True
+#app.config['PROPAGATE_EXCEPTIONS'] = True
+#app.config['DEBUG'] = True
 name = "measure_device_base"
 user = "pmezydlo"
 host = "localhost"
@@ -29,6 +28,7 @@ def add_device():
 def add_task():
     if request.method == 'POST':
         base.add_task_json(request.data)
+        print request.data
     return base.get_tasks_list_json()
 
 @app.route('/api/task/<task_id>', methods=['DELETE'])

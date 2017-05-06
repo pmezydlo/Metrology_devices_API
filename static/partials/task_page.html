@@ -1,24 +1,29 @@
 <div class="dev_list">
     <div ng-repeat="task in taskData">
-        ID:{{task.task_id}}<br>  
-        Name:{{task.task_name}}<br>
-        Date:{{task.task_date}}<br>
-        Time:{{task.task_time}}<br>
+        ID:{{task.id}}<br>  
+        Name:{{task.name}}<br>
+        Device:<div ng-repeat="dev in devData"><div ng-if="task.dev == dev.id">{{dev.own_name}}</div></div><br>
+        Date:{{task.date}}<br>
+        Time:{{task.time}}<br>
+        Status:{{task.status}}<br>
         <br>
-        <textarea rows="10" cols="50" ng-model="task.task_msg"></textarea><br>
+        <textarea rows="10" cols="50" ng-model="task.msg"></textarea><br>
         <br>
         {{task.task_req}}
-        <button type="submit" ng-click="deleteTask(task.task_id)">Delete</button>        
-        <button type="submit" ng-click="updateTask(task.task_id)">Update</button> 
+        <button type="submit" ng-click="deleteTask(task.id)">Delete</button>        
+        <button type="submit" ng-click="updateTask(task.id)">Update</button> 
         <hr>
     </div>
 
     <div class="task_form">
         <h1>Add new task</h1>
-        Name:<input type="text" placeholder="task name" ng-model="taskFormData.task_name"><br>
-        Date:<input type="text" placeholder="date" ng-model="taskFormData.task_date"><br>  
-        Time:<input type="text" placeholder="time" ng-model="taskFormData.task_time"><br>
-        <textarea rows="10" cols="50" ng-model="taskFormData.task_msg"></textarea><br>
+        Name:<input type="text" placeholder="name" ng-model="taskFormData.name"><br>
+        Date:<input type="text" placeholder="date" ng-model="taskFormData.date"><br>  
+        Time:<input type="text" placeholder="time" ng-model="taskFormData.time"><br>
+        Device:<select ng-model="taskFormData.dev"> 
+			<option ng-repeat="dev in devData" placeholder="" value="{{dev.id}}">{{dev.own_name}}</option>
+            </select><br>
+        <textarea rows="10" cols="50" ng-model="taskFormData.msg"></textarea><br>
         <br><button type="submit" ng-click="createTask()">Submit</button>
     </div>
 

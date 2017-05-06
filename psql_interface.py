@@ -55,26 +55,6 @@ class psql_connection(object):
         except:
             print "delete logs"
 
-    def get_device_list(self):
-        try: 
-            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cur.execute("SELECT * FROM devices")
-            ret = cur.fetchall()
-            cur.close()
-            return ret
-        except:
-            print "database error select"
-
-    def get_noready_device_list(self):
-        try: 
-            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cur.execute("SELECT * FROM devices WHERE status = 'NOREADY'")
-            ret = cur.fetchall()
-            cur.close()
-            return ret
-        except:
-            print "database error select"
-
     def get_devices_list_json(self):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -105,6 +85,16 @@ class psql_connection(object):
         except:
             print "database error delete"
 
+    def get_device_by_id(self, dev_id):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute("SELECT * FROM devices WHERE id = %s", (dev_id,))
+            ret = cur.fetchall()
+            cur.close()
+            return ret
+        except:
+            print "database error select"
+
     def get_tasks_list_json(self):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -120,7 +110,7 @@ class psql_connection(object):
         try:
             data = json.loads(json_data)
             cur = self.connect.cursor()
-            cur.execute("INSERT INTO tasks VALUES (default, %s, %s, %s, %s)", (data['task_name'], data['task_date'], data['task_time'], data['task_msg'])) 
+            cur.execute("INSERT INTO tasks VALUES (default, %s, %s, %s, %s, default, %s, '')", (data['name'], data['dev'], data['date'], data['time'], data['msg'])) 
             self.connect.commit()
             cur.close()
         except:
@@ -129,19 +119,27 @@ class psql_connection(object):
     def del_task_by_id(self, task_id):
         try:
             cur = self.connect.cursor()
-            cur.execute("DELETE FROM tasks WHERE task_id = %s", (task_id,))
+            cur.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
             self.connect.commit()
             cur.close()
         except:
             print "database error delete"
 
+    def get_pending_task(self, d, t):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute("SELECT * FROM tasks WHERE status = 'PENDING' AND date = %s AND time = %s", (d, t,))
+            ret = cur.fetchall()
+            cur.close()
+            return ret
+        except:
+            print "database error select"
 
-    def update_device_status(self, dev_id, status):
+    def update_task_status(self, task_id, status):
         try:
             cur = self.connect.cursor()
-            cur.execute("UPDATE devices SET status=(%s) WHERE id = (%s)", (status, dev_id,))
+            cur.execute("UPDATE tasks SET status=(%s) WHERE id = (%s)", (status, task_id,))
             self.connect.commit()
             cur.close()
         except:
             print "database error update staus"
-       

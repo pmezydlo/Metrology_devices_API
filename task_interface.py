@@ -2,6 +2,7 @@ import sys
 import threading
 from telnetlib_receive_all import Telnet
 import time
+import Queue
 
 class lan(object):
     def __init__(self, lan_ip, lan_port):
@@ -31,17 +32,19 @@ class lan(object):
     def close(self):
         self.tn.close()
 
-class dev_core (threading.Thread):
-    def __init__ (self, dev_id, own_dev_name, lan_ip, lan_port):
+class task_core (threading.Thread):
+    def __init__ (self, task_id, task_name, lan_ip, lan_port):
         threading.Thread.__init__(self)
-        self.dev = None
-        self.name = own_dev_name
-        self.dev_id = dev_id
+
+        self.name = task_name
+        
         self.lan_ip = lan_ip
         self.lan_port = lan_port
-        self.dev = lan(self.lan_ip, self.lan_port)
+        #self.dev = lan(self.lan_ip, self.lan_port)
+        self.msg_queue = Queue.Queue()
 
     def run(self):
         print self.name
-
+        #while not self.msg_queue.empty():
+          #  print self.msg_queue.get()
 
