@@ -31,6 +31,11 @@ def add_task():
         base.add_task_json(request.data)
     return base.get_tasks_list_json()
 
+@app.route('/api/task/<task_id>', methods=['DELETE'])
+def del_task(task_id):
+    base.del_task_by_id(task_id)
+    return base.get_tasks_list_json()
+
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
 def del_device(dev_id):
     base.del_device_by_id(dev_id)

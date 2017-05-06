@@ -59,9 +59,19 @@ class psql_connection(object):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cur.execute("SELECT * FROM devices")
+            ret = cur.fetchall()
             cur.close()
-            return cur.fetchall()
+            return ret
+        except:
+            print "database error select"
 
+    def get_noready_device_list(self):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute("SELECT * FROM devices WHERE status = 'NOREADY'")
+            ret = cur.fetchall()
+            cur.close()
+            return ret
         except:
             print "database error select"
 
@@ -80,7 +90,7 @@ class psql_connection(object):
         try:
             data = json.loads(json_data)
             cur = self.connect.cursor()
-            cur.execute("INSERT INTO devices VALUES (default, %s, %s, %s)", (data['own_name'], data['lan_address'], data['lan_port']))
+            cur.execute("INSERT INTO devices VALUES (default,  %s, '', '', '', '', %s, %s, 'NOREADY')", (data['own_name'], data['lan_address'], data['lan_port']))
             self.connect.commit()
             cur.close()
         except:
@@ -110,12 +120,28 @@ class psql_connection(object):
         try:
             data = json.loads(json_data)
             cur = self.connect.cursor()
-            print json_data
-            cur.execute("INSERT INTO tasks VALUES (default, %s, %s, %s, %s)", (data['task_name'], data['task_date'], data['task_time'], data['task_msg']))
-            
+            cur.execute("INSERT INTO tasks VALUES (default, %s, %s, %s, %s)", (data['task_name'], data['task_date'], data['task_time'], data['task_msg'])) 
             self.connect.commit()
             cur.close()
         except:
             print "database error insert"
 
+    def del_task_by_id(self, task_id):
+        try:
+            cur = self.connect.cursor()
+            cur.execute("DELETE FROM tasks WHERE task_id = %s", (task_id,))
+            self.connect.commit()
+            cur.close()
+        except:
+            print "database error delete"
 
+
+    def update_device_status(self, dev_id, status):
+        try:
+            cur = self.connect.cursor()
+            cur.execute("UPDATE devices SET status=(%s) WHERE id = (%s)", (status, dev_id,))
+            self.connect.commit()
+            cur.close()
+        except:
+            print "database error update staus"
+       

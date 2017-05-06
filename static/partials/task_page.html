@@ -1,12 +1,16 @@
 <div class="dev_list">
     <div ng-repeat="task in taskData">
-        ID:{{task.task_id}}  Name:{{task.task_name}}  Date:{{task.task_date}}  Time:{{task.task_time}} <br>
+        ID:{{task.task_id}}<br>  
+        Name:{{task.task_name}}<br>
+        Date:{{task.task_date}}<br>
+        Time:{{task.task_time}}<br>
         <br>
         <textarea rows="10" cols="50" ng-model="task.task_msg"></textarea><br>
         <br>
         {{task.task_req}}
-        <button type="submit" ng-click="deleteTask()">Delete</button></td>        
-    <hr>
+        <button type="submit" ng-click="deleteTask(task.task_id)">Delete</button>        
+        <button type="submit" ng-click="updateTask(task.task_id)">Update</button> 
+        <hr>
     </div>
 
     <div class="task_form">

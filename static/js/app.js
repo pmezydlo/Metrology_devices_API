@@ -36,6 +36,7 @@ myApp.controller('mainController', ($scope, $http) => {
 
     $scope.taskData = {};
     $scope.taskFormData = {};
+    $scope.taskUpdateData = {};
 
     $http.get('/api/task')
     .success((data) => {
@@ -45,6 +46,41 @@ myApp.controller('mainController', ($scope, $http) => {
     .error((error) => {
         console.log('Error: ' + error);
     });
+
+    $scope.createTask = () => {
+        $http.post('/api/task', $scope.taskFormData)
+        .success((data) => {
+            $scope.taskFormData = {};
+            $scope.taskData = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
+    $scope.updateTask = (taskID) => {
+        $http.post('/api/task/update/'+taskID, $scope.taskUpdateData)
+        .success((data) => {
+            $scope.taskUpdateData = {};
+            $scope.taskData = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
+    $scope.deleteTask = (taskID) => {
+        $http.delete('/api/task/' + taskID)
+        .success((data) => {
+            $scope.taskData = data;
+            console.log(data);
+        })
+        .error((data) => {
+        console.log('Error: ' + data);
+        });
+    };
 
     $http.get('/api/dev')
     .success((data) => {
@@ -60,18 +96,6 @@ myApp.controller('mainController', ($scope, $http) => {
         .success((data) => {
             $scope.formData = {};
             $scope.devData = data;
-            console.log(data);
-        })
-        .error((error) => {
-            console.log('Error: ' + error);
-        });
-    };
-
-    $scope.createTask = () => {
-        $http.post('/api/task', $scope.taskFormData)
-        .success((data) => {
-            $scope.taskFormData = {};
-            $scope.taskData = data;
             console.log(data);
         })
         .error((error) => {

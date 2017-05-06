@@ -11,7 +11,6 @@ class lan(object):
             self.tn = Telnet(lan_ip, lan_port) 
         except:
             print('lan error')
-            sys.exit("ERROR")
 
     def read(self, command):
         wait = 1
@@ -43,30 +42,6 @@ class dev_core (threading.Thread):
         self.dev = lan(self.lan_ip, self.lan_port)
 
     def run(self):
-        counter = 5
-        delay = self.dev_id
-        while counter:
+        print self.name
 
-            #id = self.dev.read("*IDN?")
 
-            #if id == "command_error":
-             #   print('No response from device')
-              #  sys.exit("ERROR")
-
-            #ids = id.split(',')
-    
-            #print('ID: {} name: {} mes:{}'.format(self.dev_id, self.name, id))
-
-            #self.manufacturer = ids[0]
-            #self.dev_name = ids[1]
-           # self.serial_number = ids[2]
-            #self.firmware_version = ids[3]
-            print 5
-            time.sleep(delay)
-            counter -= 1
-
-    def push_status(self, base_connect):
-        pass
-
-    def dev_exit():
-        pass
