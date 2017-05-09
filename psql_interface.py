@@ -24,13 +24,16 @@ class psql_connection(object):
     def psql_disconnect(self):
         self.connect.close()
 
-    def push_log_msg(self, msg, type):
+    def push_log_msg(self, part_of_sys, type, msg):
         try:
             cur = self.connect.cursor()
             dt = datetime.datetime.now()
             d = dt.strftime("%d.%m.%y")
             t = dt.strftime("%H:%M:%S")
-            cur.execute("INSERT INTO logs  VALUES (default, %s, %s, %s, %s)", (d, t, type, msg))
+            print type
+            print msg
+            print part_of_sys
+            cur.execute("INSERT INTO logs  VALUES (default, %s, %s, %s, %s)", (d, t, part_of_sys, type, msg,))
             self.connect.commit()
             cur.close()
         except:

@@ -28,7 +28,7 @@ class lan(object):
     def read(self, command):
         wait = 2
         response = ""
-        while response != "2\n":
+        while response != "1\n":
             self.tn.write("*OPC?\n")
             response = self.tn.read_until("\n", wait)
 
@@ -36,10 +36,12 @@ class lan(object):
         return self.tn.read_until("\n", wait)
 
     def write(self, command):
+        wait = 2
         self.tn.write(command + "\n")
-
-    def ping(self):
-        return os.system("ping -c 2 " + osc_ip + " > /dev/null")
+        response = ""
+        while response != "1\n":
+            self.tn.write("*OPC?\n")
+            response = self.tn.read_until("\n", wait)
 
     def close(self):
         self.tn.close()
@@ -47,24 +49,31 @@ class lan(object):
 class task_core (threading.Thread):
     def __init__ (self, task_id, task_name, lan_ip, lan_port):
         threading.Thread.__init__(self)
-
         self.id = task_id
         self.name = task_name
-
         self.rqss_queue = rqs_queue 
-        
         self.lan_ip = lan_ip
         self.lan_port = lan_port
-        #self.dev = lan(self.lan_ip, self.lan_port)
+        self.dev = lan(self.lan_ip, self.lan_port)
         self.msg_queue = Queue.Queue()
 
     def run(self):
-        while not self.msg_queue.empty():
-            rqs_data = []
-            rqs_data.append(PART_SYS.BASE)
-            rqs_data.append(self.id)
-            rqs_data.append(self.msg_queue.get())
-            self.rqss_queue.put(rqs_data)
+        def get_task_to_execute():
+            while not self.msg_queue.empty():
+                rqs_data = []
+                rqs_data.append(PART_SYS.BASE)
+                rqs_data.append(self.id)
+                data = self.msg_queue.get()
+                cmd = data.split('|')
+                if cmd[0] == 'W':
+                    self.dev.write(cmd[1])
+                    rqs_data.append('ok\n')
+                elif cmd[0] == 'R':
+                    rqs_data.append(self.dev.read(cmd[1]))
+                self.rqss_queue.put(rqs_data)
+
+        get_task_to_execute()
+        self.dev.close()
         rqs_data = []
         rqs_data.append(PART_SYS.CORE)
         rqs_data.append(self.id)
@@ -74,7 +83,6 @@ class task_core (threading.Thread):
 class maincore(threading.Thread):
     def __init__ (self, base_name, base_user, base_password, base_host):
         threading.Thread.__init__(self)
-
         self.tasks_thread_list = []
         self.base = psql_connection(base_name, base_user, base_host, base_password)
 
@@ -114,27 +122,28 @@ class maincore(threading.Thread):
                 del(task_th)
             self.base.psql_disconnect()
 
-        def push_task_request(task_id, msgs):
-            task_msg = self.base.get_task_request(task_id)
-            self.base.push_task_request(task_id, '{}\n{}'.format(task_msg, msgs))
+        def discharge_rqs_queue():
+            while not rqs_queue.empty():
+                data = rqs_queue.get()
+                print data
+                if (data[0] == PART_SYS.CORE):
+                    if (data[2] == 'END'):
+                        self.base.update_task_status(data[1], 'READY')
+                        print "task is ending"
+                        delete_thread_task(data[1])
 
-        add_tasks_to_execute()
-        counter = 5
+                elif (data[0] == PART_SYS.BASE):
+                    task_msg = self.base.get_task_request(data[1])
+                    self.base.push_task_request(data[1], '{}{}'.format(task_msg, data[2]))
+                else:
+                    print "ERROR bad task request"
+
+       
+        counter = 6000
         while counter:
-            print counter 
-            time.sleep(0.5)
+            add_tasks_to_execute() 
+            time.sleep(0.1)
             counter -= 1
+            discharge_rqs_queue()
 
-        while not rqs_queue.empty():
-            data = rqs_queue.get()
-            if (data[0] == PART_SYS.CORE):
-                if (data[2] == 'END'):
-                    self.base.update_task_status(data[1], 'READY')
-                    delete_thread_task(data[1])
-
-            elif (data[0] == PART_SYS.BASE):
-                push_task_request(data[1], data[2])
-            else:
-                print "error"
-                
         core_release()
