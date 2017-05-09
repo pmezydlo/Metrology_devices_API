@@ -128,7 +128,7 @@ class psql_connection(object):
     def get_pending_task(self, d, t):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cur.execute("SELECT * FROM tasks WHERE status = 'PENDING' AND date = %s AND time = %s", (d, t,))
+            cur.execute("SELECT * FROM tasks WHERE status = 'PENDING'") #AND date = %s AND time = %s", (d, t,))
             ret = cur.fetchall()
             cur.close()
             return ret
@@ -143,3 +143,24 @@ class psql_connection(object):
             cur.close()
         except:
             print "database error update staus"
+
+    def get_task_request(self, task_id):
+        try: 
+            cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute("SELECT (req) FROM tasks WHERE id = %s", (task_id,))
+            ret = cur.fetchall()
+            cur.close()
+            return ret[0][0]
+        except:
+            print "database error select"
+
+    def push_task_request(self, task_id, msg):
+        try:
+            cur = self.connect.cursor()
+            cur.execute("UPDATE tasks SET req=(%s) WHERE id = (%s)", (msg, task_id,))
+            self.connect.commit()
+            cur.close()
+        except:
+            print "database error update rqs"
+
+
