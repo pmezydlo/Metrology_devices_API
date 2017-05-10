@@ -2,27 +2,17 @@
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Own name</th>
-                    <th>Manufacturer</th>
                     <th>Name</th>
-                    <th>Serial</th>
-                    <th>Firmware</th>
                     <th>IP</th>
                     <th>Port</th>
-                    <th>Status</th>
                     <th></th>
                 </tr>
     
                 <tr ng-repeat="dev in devData">
                     <td> {{dev.id}}</td>
-                    <td> {{dev.own_name}}</td>
-                    <td> {{dev.manufacturer}}</td>
                     <td> {{dev.name}}</td>
-                    <td> {{dev.serial_nr}}</td>
-                    <td> {{dev.firmware_ver}} </td>
                     <td> {{dev.lan_address}}</td>
                     <td> {{dev.lan_port}}</td>
-                    <td> {{dev.status}}</td>
                     <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
                 </tr>
             </table>

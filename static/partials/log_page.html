@@ -5,14 +5,16 @@
                     <th>ID</th>
                     <th>Date</th>
                     <th>Time</th>
-		    <th>Type</th>
+                    <th>Part of system</th>
+	            <th>Type</th>
                     <th>Message</th>
                 </tr>
                 <tr ng-repeat="log in logsData">
                     <td> {{log.id}}  </td>
                     <td> {{log.date}} </td>
                     <td> {{log.time}} </td>
-		    <td> {{log.type}}
+                    <td> {{log.sys}} </td>
+                    <td> {{log.type}} </td>
                     <td> {{log.msg}}  </td>
                 </tr>
             </table>

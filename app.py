@@ -1,12 +1,12 @@
 from flask import render_template, request
 from flask import Flask
+from psql_interface import psql_connection
+
+
 import json
 import threading
 import time
 import sys 
-
-from psql_interface import psql_connection
-from maincore import maincore
 
 app = Flask(__name__)
 #app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -63,7 +63,7 @@ def index():
 
 @app.before_first_request
 def active_core():
-    pass
+    base.push_log_msg('SERVER', 'LOG', "Server is up")
 
 def main():
     app.run()

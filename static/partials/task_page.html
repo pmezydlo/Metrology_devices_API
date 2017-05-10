@@ -2,7 +2,7 @@
     <div ng-repeat="task in taskData">
         ID:{{task.id}}<br>  
         Name:{{task.name}}<br>
-        Device:<div ng-repeat="dev in devData"><div ng-if="task.dev == dev.id">{{dev.own_name}}</div></div><br>
+        Device:<div ng-repeat="dev in devData"><div ng-if="task.dev == dev.id">{{dev.name}}</div></div><br>
         Date:{{task.date}}<br>
         Time:{{task.time}}<br>
         Status:{{task.status}}<br>
@@ -22,7 +22,7 @@
         Date:<input type="text" placeholder="date" ng-model="taskFormData.date"><br>  
         Time:<input type="text" placeholder="time" ng-model="taskFormData.time"><br>
         Device:<select ng-model="taskFormData.dev"> 
-			<option ng-repeat="dev in devData" placeholder="" value="{{dev.id}}">{{dev.own_name}}</option>
+			<option ng-repeat="dev in devData" placeholder="" value="{{dev.id}}">{{dev.name}}</option>
             </select><br>
         <textarea rows="10" cols="50" ng-model="taskFormData.msg"></textarea><br>
         <br><button type="submit" ng-click="createTask()">Submit</button>
