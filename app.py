@@ -61,6 +61,13 @@ def get_logs():
 def index():
     return render_template("index.html")
 
+@app.route(/api/sys/dt)
+def get_dt:
+    dt = datetime.datetime.now()
+    d = dt.strftime("%d.%m.%y")
+    t = dt.strftime("%H:%M:%S")
+return 'dt' 
+
 @app.before_first_request
 def active_core():
     base.push_log_msg('SERVER', 'LOG', "Server is up")

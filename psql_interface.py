@@ -71,8 +71,10 @@ class psql_connection(object):
             cur.execute("INSERT INTO devices VALUES (default,  %s, %s, %s)", (data['own_name'], data['lan_address'], data['lan_port']))
             self.connect.commit()
             cur.close()
-        except psycopg2.Error as e:
-            self.push_log_msg('BASE', e.diag.severity, e.diag.message_primary)
+        except Exception as err:
+            print err
+            self.push_log_msg('BASE', 'ERROR', 'Error concerns with:{}'.format(err))
+
 
     def del_device_by_id(self, dev_id):
         try:
@@ -127,7 +129,7 @@ class psql_connection(object):
     def get_pending_task(self, d, t):
         try: 
             cur = self.connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cur.execute("SELECT * FROM tasks WHERE status = 'PENDING'") #AND date = %s AND time = %s", (d, t,))
+            cur.execute("SELECT * FROM tasks WHERE status = 'PENDING' AND ((date = %s AND time = %s) OR (date='NOW' AND time='NOW'))", (d, t,))
             ret = cur.fetchall()
             cur.close()
             return ret
