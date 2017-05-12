@@ -121,7 +121,8 @@ class maincore(threading.Thread):
         threading.Thread.__init__(self)
         self.tasks_thread_list = []
         self.base = psql_connection(base_name, base_user, base_host, base_password)
-
+        self.exit_signal = False
+        self.run_signal = True
 
     def run(self):
         def add_tasks_to_execute():
@@ -177,11 +178,12 @@ class maincore(threading.Thread):
                 else:
                     self.base.push_log_msg('CORE', 'LOG', "Core have problem with interpreting tasks request")
 
-        counter = 600
-        while counter:
-            add_tasks_to_execute() 
-            time.sleep(0.1)
-            counter -= 1
-            discharge_rqs_queue()
+        while 1: 
+            if self.exit_signal == True:
+                break
+
+            if self.run_signal == True:
+                add_tasks_to_execute() 
+                discharge_rqs_queue()
 
         core_release()

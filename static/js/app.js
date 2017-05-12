@@ -27,7 +27,7 @@ myApp.config(['$routeProvider',
             });
         }]);
 
-myApp.controller('mainController', ($scope, $http) => {
+myApp.controller('mainController', ($scope, $http, $timeout) => {
 
     $scope.formData = {};
     $scope.devData = {};
@@ -36,33 +36,36 @@ myApp.controller('mainController', ($scope, $http) => {
 
     $scope.taskData = {};
     $scope.taskFormData = {};
-    $scope.taskUpdateData = {};
+    $scope.sys = {};
+
+    var timer_fun = function() {
+        $http.get('/api/sys')
+        .success((data) => {
+            $scope.sys = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+        $timeout(timer_fun, 1000);
+    }
+
+    $timeout(timer_fun, 1000);
+
 
     $http.get('/api/task')
-    .success((data) => {
-        $scope.taskData = data;
-        console.log(data);
-    })
-    .error((error) => {
-        console.log('Error: ' + error);
-    });
-
-    $scope.createTask = () => {
-        $http.post('/api/task', $scope.taskFormData)
         .success((data) => {
-            $scope.taskFormData = {};
             $scope.taskData = data;
             console.log(data);
         })
         .error((error) => {
             console.log('Error: ' + error);
         });
-    };
 
-    $scope.updateTask = (taskID) => {
-        $http.post('/api/task/update/'+taskID, $scope.taskUpdateData)
+    $scope.createTask = () => {
+        $http.post('/api/task', $scope.taskFormData)
         .success((data) => {
-            $scope.taskUpdateData = {};
+            $scope.taskFormData = {};
             $scope.taskData = data;
             console.log(data);
         })
@@ -105,6 +108,16 @@ myApp.controller('mainController', ($scope, $http) => {
 
     $scope.sysStop = () => {
         $http.post('/api/sys/stop')
+        .success((data) => {
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
+    $scope.sysShutdown = () => {
+        $http.post('/api/sys/shutdown')
         .success((data) => {
             console.log(data);
         })
