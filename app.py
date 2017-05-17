@@ -54,7 +54,7 @@ def get_dt():
     dt = datetime.datetime.now()
     d = dt.strftime("%d.%m.%y")
     t = dt.strftime("%H:%M:%S")
-    ret = {u"date": d, u"time": t, u"core_run": core.run_signal}
+    ret = {u"date": d, u"time": t, u"core_run": core.run_signal, u"task_counter":core.task_counter}
     return json.dumps(ret)
 
 @app.before_first_request

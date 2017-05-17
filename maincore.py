@@ -123,6 +123,7 @@ class maincore(threading.Thread):
         self.base = psql_connection(base_name, base_user, base_host, base_password)
         self.exit_signal = False
         self.run_signal = True
+        self.task_counter = 0
 
     def run(self):
         def add_tasks_to_execute():
@@ -140,6 +141,7 @@ class maincore(threading.Thread):
                         task_thread.cmd_queue.put(cmd)
 
                     task_thread.start()
+                    self.task_counter += 1
                 except:
                     self.base.push_log_msg('CORE', 'ERROR', "Core has problem with register new thread")
                 else:
@@ -151,7 +153,8 @@ class maincore(threading.Thread):
             for task_th in self.tasks_thread_list:
                 if task_id == task_th.id:
                     task_th.join()
-                    self.tasks_thread_list.remove(task_th)
+                    self.task_counter -= 1
+                self.tasks_thread_list.remove(task_th)
 
         def core_release():
             for task_th in self.tasks_thread_list:
