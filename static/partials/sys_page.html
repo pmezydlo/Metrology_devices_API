@@ -2,4 +2,28 @@
 <button type="submit" ng-click="sysStart()">Start core</button>
 <button type="submit" ng-click="sysStop()">Stop core</button>
 <button type="submit" ng-click="sysShutdown()">Shutdown</button>
+<br>
+<br>
 
+<h2>Platform</h2>
+{{sysData.version}}<br>
+{{sysData.machine}}<br>
+
+<h2>Memory</h2>
+Used space: {{sysData.mem_used}}<br>
+Free space: {{sysData.mem_free}}<br>
+Used space: {{sysData.mem_percent}}<br>
+Total space: {{sysData.mem_total}}<br>
+
+
+<h2>Disk</h2>
+Used space: {{sysData.disk_used}}<br>
+Free space: {{sysData.disk_free}}<br>
+Used space: {{sysData.disk_percent}}<br>
+Total space: {{sysData.disk_total}}<br>
+
+<h2>CPU</h2>
+Usage:             {{sysData.cpu_usage}}<br>
+Max frequency:     {{sysData.cpu_freq_max}}<br>
+Min frequency:     {{sysData.cpu_freq_min}}<br>
+Current frequency: {{sysData.cpu_freq_curr}}<br>

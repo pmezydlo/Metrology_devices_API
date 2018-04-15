@@ -7,6 +7,7 @@ import socket
 import time
 import Queue
 from enum import Enum
+from device import oscilloscope
 
 class PART_SYS(Enum):
     CORE = 1
@@ -14,12 +15,19 @@ class PART_SYS(Enum):
     TASK = 3
     LOGS = 4
 
+class DEV_TYPE(Enum):
+    NOT_DEFINED = 'NOT_DEFINED'
+    OSCILLOSCOPE = 'OSCILLOSCOPE'
+    MULTIMETER = 'MULTIMETER'
+    FUNCTION_GENERATOR = 'FUNCTION_GENERATOR'
+
 class msg(object):
-    def __init__(self, owner, owner_id, receiver, receiver_id, data):
+    def __init__(self, owner, owner_id, receiver, receiver_id, cmd, data):
         self.owner = owner
         self.owner_id = owner_id
         self.receiver = receiver
         self.receiver_id = receiver_id
+        self.cmd = cmd
         self.data = data
 
 rqs_queue = Queue.Queue()
@@ -61,48 +69,113 @@ class lan(object):
         self.write(cmd)
         return self.read()
 
+    def opc_ask(self, command):
+        response = ""
+        while response != "1\n":
+            response = self.ask("*OPC?\n")
+        self.write(command + "\n")
+        return self.read()
+
+    def opc_read(self):
+        ret = self.read()
+        response = ""
+        while response != "1\n":
+            response = self.ask("*OPC?\n")
+        return ret
+
+    def opc_write(self, command):
+        self.write(command + "\n")
+        response = ""
+        while response != "1\n":
+            response = self.ask("*OPC?\n")
+
 class task_core(threading.Thread):
-    def __init__(self, task_id, task_name, lan_ip, lan_port, lan_timeout, buf_size):
+    def __init__(self, task_id, task_name, dev_type, lan_ip, lan_port, lan_timeout, buf_size):
         threading.Thread.__init__(self)
         self.id = task_id
         self.name = task_name
         self.rqss_queue = rqs_queue
         self.lan_port = lan_port
         self.lan_ip = lan_ip
+        self.dev_type = dev_type
+
+        if self.dev_type == 'OSCILLOSCOPE':
+            self.dev = oscilloscope()
+        elif self.dev_type == 'MULTIMETER':
+            pass
+        elif self.dev_type == 'FUNCTION_GENERATOR':
+            pass
+        else:
+            self.dev = 0
+
         self.cmd_queue = Queue.Queue()
         self.eth = lan(lan_ip, lan_port, lan_timeout, buf_size) 
 
     def run(self): 
         def push_log_msg(type_log, msg_log):
-            log_msg = msg(PART_SYS.TASK, self.id, PART_SYS.LOGS, 0, "{}|{}".format(type_log, msg_log))
+            log_msg = msg(PART_SYS.TASK, self.id, PART_SYS.LOGS, 0, "", "{}|{}".format(type_log, msg_log))
             self.rqss_queue.put(log_msg)
-
-        def lan_read(command):
-            response = ""
-            while response != "1\n":
-                response = self.eth.ask("*OPC?\n")
-
-            self.eth.write(command + "\n")
-            return self.eth.read()
-
-        def lan_write(command):
-            self.eth.write(command + "\n")
-            response = ""
-            while response != "1\n":
-                response = self.eth.ask("*OPC?\n")
           
         def get_task_to_execute():
             while not self.cmd_queue.empty():
                 data = self.cmd_queue.get()
-                cmd = data.data.split('|')
-                ret = 0
-                if cmd[0] == 'W':
-                    lan_write(cmd[1])
-                    ret = 'ok\n'
-                elif cmd[0] == 'R':
-                    ret = lan_read(cmd[1])
 
-                rqs_data = msg(PART_SYS.TASK, self.id, PART_SYS.BASE, 0, ret)
+                if data.cmd == "opc_ask":
+                    req = self.eth.opc_ask(data.data)
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = req
+                elif data.cmd == "ask":
+                    req = self.eth.ask(data.data)
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = req
+                elif data.cmd == "opc_read":
+                    req = self.eth.opc_read()
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = req
+                elif data.cmd == "opc_write":
+                    self.eth.opc_write(data.data)
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = "ok\n"
+                elif data.cmd == "read":
+                    req = self.eth.read()
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = req
+                elif data.cmd == "write":
+                    self.eth.write(data.data)
+                    if self.eth.is_error:
+                        ret = ("ERR:{}".format(self.eth.what_error))
+                    else:
+                        ret = "ok\n"
+                elif data.cmd == "delay":
+                    time.sleep(float(data.data))
+                    ret = "ok\n"
+                elif data.cmd == "off":
+                    
+                    ret = "ok\n"
+
+                else:
+                    print("dev:".format(self.dev_type))
+                    if self.dev_type == 'OSCILLOSCOPE':
+                        ret = self.dev.decode(data.cmd, data.data)
+                        
+                    elif self.dev_type == 'MULTIMETER':
+                        pass
+                    elif self.dev_type == 'FUNCTION_GENERATOR':
+                        pass
+                    else:
+                        pass
+
+                rqs_data = msg(PART_SYS.TASK, self.id, PART_SYS.BASE, 0, "", ret)
                 self.rqss_queue.put(rqs_data)
 
         if self.eth.is_error:
@@ -113,7 +186,7 @@ class task_core(threading.Thread):
             get_task_to_execute()
             self.eth.close()
 
-        rqs_data = msg(PART_SYS.TASK, self.id, PART_SYS.CORE, 0, 'END')
+        rqs_data = msg(PART_SYS.TASK, self.id, PART_SYS.CORE, 0, 'END', "")
         self.rqss_queue.put(rqs_data)
 
 class maincore(threading.Thread):
@@ -134,16 +207,19 @@ class maincore(threading.Thread):
             for task in task_list:
                 try:
                     dev = self.base.get_device_by_id(task["dev"])
-                    task_thread = task_core(task["id"], task["name"], dev[0]["lan_address"], dev[0]["lan_port"], 2, 1024) 
+                    task_thread = task_core(task["id"], task["name"], dev[0]["types"], dev[0]["lan_address"], dev[0]["lan_port"], 2, 1024)
                     lines = task["msg"].splitlines()
                     for line in lines:
-                        cmd = msg(PART_SYS.CORE, 0, PART_SYS.TASK, task["id"], line)
-                        task_thread.cmd_queue.put(cmd)
+                        cmd = line.split("(", 1)[0]
+                        arg = line[line.find("(")+1:line.find(")")]
+                        data = msg(PART_SYS.CORE, 0, PART_SYS.TASK, task["id"], cmd, arg)
+                        task_thread.cmd_queue.put(data)
 
                     task_thread.start()
                     self.task_counter += 1
                 except:
                     self.base.push_log_msg('CORE', 'ERROR', "Core has problem with register new thread")
+                    self.base.update_task_status(task["id"], 'READY')
                 else:
                     self.base.push_log_msg('CORE', 'LOG', "TASK id:{} name:{} ruinning correctly".format(task["id"], task["name"]))
                     self.tasks_thread_list.append(task_thread)
@@ -166,7 +242,7 @@ class maincore(threading.Thread):
             while not rqs_queue.empty():
                 rqs = rqs_queue.get()
                 if rqs.receiver == PART_SYS.CORE:
-                    if rqs.data == 'END':
+                    if rqs.cmd == 'END':
                         self.base.update_task_status(rqs.owner_id, 'READY')
                         self.base.push_log_msg('CORE', 'LOG', "TASK id:{} has ended".format(rqs.owner_id))
                         delete_thread_task(rqs.owner_id)

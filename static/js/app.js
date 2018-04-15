@@ -27,31 +27,16 @@ myApp.config(['$routeProvider',
             });
         }]);
 
-myApp.controller('mainController', ($scope, $http, $timeout) => {
+myApp.controller('mainController', ($scope, $http) => {
 
     $scope.formData = {};
     $scope.devData = {};
     $scope.newStatus = 'RUN';
     $scope.logsData = {};
+    $scope.sysData = {};
 
     $scope.taskData = {};
     $scope.taskFormData = {};
-    $scope.sys = {};
-
-    var timer_fun = function() {
-        $http.get('/api/sys')
-        .success((data) => {
-            $scope.sys = data;
-            console.log(data);
-        })
-        .error((error) => {
-            console.log('Error: ' + error);
-        });
-        $timeout(timer_fun, 1000);
-    }
-
-    $timeout(timer_fun, 1000);
-
 
     $http.get('/api/task')
         .success((data) => {
@@ -65,6 +50,7 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
     $scope.createTask = () => {
         $http.post('/api/task', $scope.taskFormData)
         .success((data) => {
+            console.log()
             $scope.taskFormData = {};
             $scope.taskData = data;
             console.log(data);
@@ -157,6 +143,15 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         console.log('Error: ' + data);
         });
     };
+
+    $http.get('/api/sys/info')
+    .success((data) => {
+        $scope.sysData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
 
     $http.get('/api/logs')
     .success((data) => {

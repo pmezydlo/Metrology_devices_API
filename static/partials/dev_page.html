@@ -1,18 +1,23 @@
        <div class="dev_list">
+
+           <h1>Devices list</h1>
             <table>
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Type</th>
                     <th>IP</th>
                     <th>Port</th>
+                    <th>Number of PS channel</th>
                     <th></th>
-                </tr>
-    
+                </tr> 
                 <tr ng-repeat="dev in devData">
                     <td> {{dev.id}}</td>
                     <td> {{dev.name}}</td>
+                    <td> {{dev.types}}</td>
                     <td> {{dev.lan_address}}</td>
                     <td> {{dev.lan_port}}</td>
+                    <td> {{dev.ps_channel}}</td>
                     <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
                 </tr>
             </table>
@@ -20,9 +25,15 @@
                 
         <div class="dev_form">
             <h1>Add new device</h1>
-            Own name:<br><input type="text" placeholder="own name" ng-model="formData.own_name"><br>
+            Own name:<br><input type="text" placeholder="own name" ng-model="formData.name"><br>
+            Type:<br><select ng-model="formData.types"><br>
+			    <option placeholder="" value="0">Not defined</option>
+			    <option placeholder="" value="1">Oscilloscope</option>
+			    <option placeholder="" value="2">Multimeter</option>
+                <option placeholder="" value="3">Function generator</option>
+            </select><br>
             IP:<br><input type="text" placeholder="lan address" ng-model="formData.lan_address"><br>
             Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
+            Power switch channel:<br><input type="number" placeholder="0" min="0" max="8" ng-model="formData.ps_channel"><br>
             <br><button type="submit" ng-click="createDev()">Submit</button>
-        </dev>
-
+        </div>
