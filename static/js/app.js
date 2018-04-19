@@ -27,7 +27,7 @@ myApp.config(['$routeProvider',
             });
         }]);
 
-myApp.controller('mainController', ($scope, $http) => {
+myApp.controller('mainController', ($scope, $http, $timeout) => {
 
     $scope.formData = {};
     $scope.devData = {};
@@ -37,7 +37,12 @@ myApp.controller('mainController', ($scope, $http) => {
 
     $scope.taskData = {};
     $scope.taskFormData = {};
+    $scope.verData = {};
 
+    $scope.status = 'Current';
+    var runtime_ver = 0;
+
+    function get_data() {
     $http.get('/api/task')
         .success((data) => {
             $scope.taskData = data;
@@ -47,6 +52,61 @@ myApp.controller('mainController', ($scope, $http) => {
             console.log('Error: ' + error);
         });
 
+    $http.get('/api/dev')
+    .success((data) => {
+        $scope.devData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+
+    $http.get('/api/sys/info')
+    .success((data) => {
+        $scope.sysData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+
+    $http.get('/api/ver')
+    .success((data) => {
+        $scope.verData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+
+    $http.get('/api/logs')
+    .success((data) => {
+        $scope.logsData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+    }
+
+    var timer_fun = function() {
+        $http.get('/api/ver')
+        .success((data) => {
+            $scope.verData = data;
+            if (runtime_ver < data.runtime) {
+                get_data();
+                runtime_ver = data.runtime;
+                $scope.status = 'Not Current';
+            } else { 
+                $scope.status = 'Current';
+            }
+        })
+        $timeout(timer_fun, 2000);
+    }
+
+    $timeout(timer_fun, 2000);
+    get_data();
+    
     $scope.createTask = () => {
         $http.post('/api/task', $scope.taskFormData)
         .success((data) => {
@@ -70,15 +130,6 @@ myApp.controller('mainController', ($scope, $http) => {
         console.log('Error: ' + data);
         });
     };
-
-    $http.get('/api/dev')
-    .success((data) => {
-        $scope.devData = data;
-        console.log(data);
-    })
-    .error((error) => {
-        console.log('Error: ' + error);
-    });
 
     $scope.createDev = () => {
         $http.post('/api/dev', $scope.formData)
@@ -144,22 +195,5 @@ myApp.controller('mainController', ($scope, $http) => {
         });
     };
 
-    $http.get('/api/sys/info')
-    .success((data) => {
-        $scope.sysData = data;
-        console.log(data);
-    })
-    .error((error) => {
-        console.log('Error: ' + error);
-    });
-
-    $http.get('/api/logs')
-    .success((data) => {
-        $scope.logsData = data;
-        console.log(data);
-    })
-    .error((error) => {
-        console.log('Error: ' + error);
-    });
 
 });

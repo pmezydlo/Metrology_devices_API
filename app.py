@@ -16,38 +16,25 @@ system = system_interface()
 def add_device():
     if request.method == 'POST':
         dev = json.loads(request.data)
-        new_dev = Device(name=dev["name"],
+        new_dev = Device.create(name=dev["name"],
                         types=dev["types"], 
                         lan_address=dev["lan_address"],
                         lan_port=dev["lan_port"],
                         ps_channel=dev["ps_channel"])
-        new_dev.save()
-        log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was added".format(new_dev.name))
-        log.save()
+        log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was added".format(new_dev.name))
     ret = []
     for dev in Device.select():
-        ret.append ({"id":dev.id,
-                     "name":dev.name,
-                     "types":DeviceType(dev.types).name,
-                     "lan_address":dev.lan_address,
-                     "lan_port":dev.lan_port,
-                     "ps_channel":dev.ps_channel})
+        ret.append (dev.get_json())
     return json.dumps(ret) 
 
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
 def del_device(dev_id):
     dev = Device.select().where(Device.id == dev_id).get()
-    log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was deleted".format(dev.name))
-    log.save()  
+    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was deleted".format(dev.name))
     dev.delete_instance()
     ret = []
     for dev in Device.select():
-        ret.append ({"id":dev.id,
-                     "name":dev.name,
-                     "types":DeviceType(dev.types).name,
-                     "lan_address":dev.lan_address,
-                     "lan_port":dev.lan_port,
-                     "ps_channel":dev.ps_channel})
+        ret.append (dev.get_json())
     return json.dumps(ret)
 
 @app.route("/api/logs", methods=['GET', 'DELETE'])
@@ -57,13 +44,13 @@ def get_logs():
         query.execute()
     ret = []
     for log in Log.select():
-        ret.append ({"date_time":log.date_time.strftime("%Y-%m-%d %H:%M:%S"),
-                     "id":log.id,
-                     "source":LogSourceType(log.source).name,
-                     "types":LogType(log.types).name,
-                     "msg":log.msg})
+        ret.append (log.get_json())
     return json.dumps(ret) 
 
+@app.route("/api/ver", methods=['GET'])
+def get_ver():
+    ver = ServerVer.select().get()
+    return json.dumps(ver.get_json())
 
 @app.route('/api/task', methods=['POST', 'GET'])
 def add_task():
@@ -80,33 +67,17 @@ def add_task():
         log.save()
     ret = []
     for task in Task.select():
-        ret.append({"name":task.name,
-                    "id":task.id,
-                     "dev":task.dev.id,
-                     "date":task.date,
-                     "time":task.time,
-                     "status":task.status,
-                     "msg":task.msg,
-                     "reg":task.req})
+        ret.append(task.get_json())
     return json.dumps(ret) 
 
 @app.route('/api/task/<task_id>', methods=['DELETE'])
 def del_task(task_id):
     task = Task.select().where(Task.id == task_id).get()
-    log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} task was deleted".format(task.name))
-    log.save()  
+    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} task was deleted".format(task.name))
     task.delete_instance()
     ret = []
     for task in Task.select():
-        print task.id
-        ret.append({"name":task.name,
-                    "id":task.id,
-                     "dev":task.dev.id,
-                     "date":task.date,
-                     "time":task.time,
-                     "status":task.status,
-                     "msg":task.msg,
-                     "reg":task.req})
+        ret.append(task.get_json())
     return json.dumps(ret) 
 
 @app.route("/")
@@ -117,14 +88,11 @@ def index():
 def get_sys_info(): 
     return system.get_system_information()
 
-@app.before_request
-def before_request():
-#    base.connect()    
-    pass
-
 @app.after_request
 def after_request(response):
- #   base.close()
+    if request.method != 'GET':
+        ver = ServerVer.select().get()
+        ver.inc_runtime()
     return response
 
 def shutdown_server():
@@ -136,7 +104,6 @@ def shutdown_server():
 @app.route('/api/sys/shutdown', methods=['POST'])
 def shutdown():
     shutdown_server()
-    #core.exit_signal = True
     #core.join()
     log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="Server is down")
     log.save()  
@@ -146,11 +113,10 @@ def shutdown():
 def main():
         #core.start()
     base.connect()
-    base.create_tables([Device, Task, Log])
-    log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="Server is up")
-    log.save() 
-    app.run()    
-
+    base.create_tables([Device, Task, Log, ServerVer])
+    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="Server is up")
+    ver = ServerVer.create(major=1, minor=0, runtime=0)
+    app.run()
 
 if __name__ == "__main__":
     main()

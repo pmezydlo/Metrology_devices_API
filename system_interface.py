@@ -4,37 +4,22 @@ import datetime
 import platform
 import psutil
 import os
+import time
 
 class system_interface(object):
     def __init__ (self):
         pass
 
-    def bytes_2_human_readable(self, number_of_bytes):
-        step_to_greater_unit = 1024.
-
-        number_of_bytes = float(number_of_bytes)
-        unit = 'bytes'
-
-        if (number_of_bytes / step_to_greater_unit) >= 1:
-            number_of_bytes /= step_to_greater_unit
-            unit = 'KB'
-
-        if (number_of_bytes / step_to_greater_unit) >= 1:
-            number_of_bytes /= step_to_greater_unit
-            unit = 'MB'
-
-        if (number_of_bytes / step_to_greater_unit) >= 1:
-            number_of_bytes /= step_to_greater_unit
-            unit = 'GB'
-
-        if (number_of_bytes / step_to_greater_unit) >= 1:
-            number_of_bytes /= step_to_greater_unit
-            unit = 'TB'
-
-        precision = 1
-        number_of_bytes = round(number_of_bytes, precision)
-
-        return str(number_of_bytes) + ' ' + unit
+    def bytes_2_human_readable(self, n):
+        symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+        prefix = {}
+        for i, s in enumerate(symbols):
+            prefix[s] = 1 << (i + 1) * 10
+        for s in reversed(symbols):
+            if n >= prefix[s]:
+                value = float(n) / prefix[s]
+                return '%.1f%s' % (value, s)
+        return "%sB" % n
 
     def get_system_information(self):
         json_info = {}
@@ -43,15 +28,19 @@ class system_interface(object):
         json_info['version'] = platform.version()
         json_info['machine'] = platform.machine()
 
-        json_info['mem_percent'] = str(psutil.virtual_memory().percent)+'%'
-        json_info['mem_used']    = self.bytes_2_human_readable(psutil.virtual_memory().used)
-        json_info['mem_total']   = self.bytes_2_human_readable(psutil.virtual_memory().total)
-        json_info['mem_free']    = self.bytes_2_human_readable(psutil.virtual_memory().free)
+        json_info['mem_percent'] = str(psutil.virtual_memory().percent)
+        json_info['mem_used']    = self.bytes_2_human_readable(psutil.virtual_memory().used)+"B"
+        json_info['mem_total']   = self.bytes_2_human_readable(psutil.virtual_memory().total)+"B"
+        json_info['mem_free']    = self.bytes_2_human_readable(psutil.virtual_memory().free)+"B"
 
-        json_info['disk_percent'] = str(psutil.disk_usage('/').percent)+'%'
-        json_info['disk_used']    = self.bytes_2_human_readable(psutil.disk_usage('/').used)
-        json_info['disk_total']   = self.bytes_2_human_readable(psutil.disk_usage('/').total)
-        json_info['disk_free']    = self.bytes_2_human_readable(psutil.disk_usage('/').free)
+        json_info['disk_percent'] = str(psutil.disk_usage('/').percent)
+        json_info['disk_used']    = self.bytes_2_human_readable(psutil.disk_usage('/').used)+"B"
+        json_info['disk_total']   = self.bytes_2_human_readable(psutil.disk_usage('/').total)+"B"
+        json_info['disk_free']    = self.bytes_2_human_readable(psutil.disk_usage('/').free)+"B"
+
+        json_info['uptime'] = str(datetime.timedelta(seconds=(int(time.time() - psutil.boot_time()))))
+        json_info['boot_time'] = str(datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"))
+
 
         cpu_usage = psutil.cpu_percent(interval=0.1, percpu=True)
         cpu_usage_str = ""
