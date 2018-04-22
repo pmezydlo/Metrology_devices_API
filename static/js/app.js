@@ -43,14 +43,14 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
     var runtime_ver = 0;
 
     function get_data() {
-    $http.get('/api/task')
-        .success((data) => {
-            $scope.taskData = data;
-            console.log(data);
-        })
-        .error((error) => {
-            console.log('Error: ' + error);
-        });
+        $http.get('/api/task')
+            .success((data) => {
+                $scope.taskData = data;
+                console.log(data);
+            })
+            .error((error) => {
+                console.log('Error: ' + error);
+            });
 
     $http.get('/api/dev')
     .success((data) => {
@@ -101,10 +101,10 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
                 $scope.status = 'Current';
             }
         })
-        $timeout(timer_fun, 2000);
+        $timeout(timer_fun, 500);
     }
 
-    $timeout(timer_fun, 2000);
+    $timeout(timer_fun, 500);
     get_data();
     
     $scope.createTask = () => {

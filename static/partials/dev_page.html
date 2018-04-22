@@ -1,39 +1,68 @@
        <div class="dev_list">
 
-           <h1>Devices list</h1>
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>IP</th>
-                    <th>Port</th>
-                    <th>Number of PS channel</th>
-                    <th></th>
-                </tr> 
-                <tr ng-repeat="dev in devData">
-                    <td> {{dev.id}}</td>
-                    <td> {{dev.name}}</td>
-                    <td> {{dev.types}}</td>
-                    <td> {{dev.lan_address}}</td>
-                    <td> {{dev.lan_port}}</td>
-                    <td> {{dev.ps_channel}}</td>
-                    <td><button type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
-                </tr>
-            </table>
+        <div class="panel panel-info">
+            <div class="panel-heading"><h4>Device list</h4></div>
+            <div class="panel-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>IP</th>
+                            <th>Port</th>
+                            <th>Number of PS channel</th>
+                            <th></th>
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="dev in devData">
+                            <td> {{dev.id}}</td>
+                            <td> {{dev.name}}</td>
+                            <td> {{dev.types}}</td>
+                            <td> {{dev.lan_address}}</td>
+                            <td> {{dev.lan_port}}</td>
+                            <td> {{dev.ps_channel}}</td>
+                            <td><button class="btn btn-danger" type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-                
-        <div class="dev_form">
-            <h1>Add new device</h1>
-            Own name:<br><input type="text" placeholder="own name" ng-model="formData.name"><br>
-            Type:<br><select ng-model="formData.types"><br>
-			    <option placeholder="" value="0">Not defined</option>
-			    <option placeholder="" value="1">Oscilloscope</option>
-			    <option placeholder="" value="2">Multimeter</option>
-                <option placeholder="" value="3">Function generator</option>
-            </select><br>
-            IP:<br><input type="text" placeholder="lan address" ng-model="formData.lan_address"><br>
-            Port:<br><input type="number" placeholder="5555" ng-model="formData.lan_port"><br>
-            Power switch channel:<br><input type="number" placeholder="0" min="0" max="8" ng-model="formData.ps_channel"><br>
-            <br><button type="submit" ng-click="createDev()">Submit</button>
+
+        <div class="panel panel-info">
+            <div class="panel-heading"><h4>Add new device</h4></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="name">Name:</label><br>
+                    <input type="text" placeholder="name" class="form-control" ng-model="formData.name" id="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Type:</label><br>
+                    <select class="form-control" ng-model="formData.types" id="type">
+			<option placeholder="" value="0">Not defined</option>
+			<option placeholder="" value="1">Oscilloscope</option>
+			<option placeholder="" value="2">Multimeter</option>
+                        <option placeholder="" value="3">Function generator</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ip_addr">IP address:</label><br>
+                    <input id="ip_addr" class="form-control" type="text" placeholder="lan address" ng-model="formData.lan_address">
+                </div>
+
+                <div class="form-group">
+                    <label for="ip_port">IP port</label><br>
+                    <input id="ip_port" class="form-control" type="number" placeholder="5555" ng-model="formData.lan_port">
+                </div>
+
+                <div class="form-group">
+                    <label for="ip_port">PS channel:</label><br>
+                    <input id="ip_port" class="form-control" type="number" placeholder="0" min="0" max="8" ng-model="formData.ps_channel">
+                </div>
+                <button type="submit" class="btn btn-primary" ng-click="createDev()">Submit</button>
+            </div>
         </div>
+    </div>

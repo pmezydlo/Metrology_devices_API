@@ -3,32 +3,33 @@
 
 from peewee import *
 from enum import Enum
-from datetime import *
+from datetime import datetime
+from croniter import croniter
 
 base = SqliteDatabase('MDA.db')
 
 class DeviceType(Enum):
-    NOT_DEFINED        = 0
-    OSCILLOSCOPE       = 1
-    MULTIMETER         = 2
-    FUNCTION_GENERATOR = 3
+    NotDefined         = 0
+    Oscilloscope       = 1
+    Multimeter         = 2
+    FunctionGenerator  = 3
 
 class LogType(Enum):
-    LOG     = 0
-    WARNING = 1
-    ERROR   = 2
+    Info    = 0
+    Warning = 1
+    Error   = 2
 
 class LogSourceType(Enum):
-    TASK        = 0
-    CORE        = 1
-    BASE        = 2
-    NOT_DEFINED = 3
-    SERVER      = 4
+    Task        = 0
+    Core        = 1
+    Base        = 2
+    NotDefined  = 3
+    Server      = 4
 
 class TaskStatusType(Enum):
-    PENDING = 0
-    RUN     = 1
-    READY   = 2
+    Pending = 0
+    Run     = 1
+    Ready   = 2
 
 class BaseModel(Model):
     class Meta:
@@ -44,10 +45,11 @@ class ServerVer(BaseModel):
         self.save()
 
     def get_json(self):
+        datetime_str = datetime.now()
         return ({"major":self.major,
                  "minor":self.minor,
-                 "runtime":self.runtime})
-
+                 "runtime":self.runtime,
+                 "server_time":datetime_str.strftime("%Y-%m-%d %H:%M:%S")})
 
 class Device(BaseModel):
     id          = PrimaryKeyField(null=False)
@@ -57,6 +59,9 @@ class Device(BaseModel):
     lan_port    = IntegerField(default=5555)
     ps_channel  = IntegerField(default=0)
 
+    ping        = 0
+    online      = False
+
     def get_json(self):
         return ({"id":self.id,
                  "name":self.name,
@@ -65,24 +70,48 @@ class Device(BaseModel):
                  "lan_port":self.lan_port,
                  "ps_channel":self.ps_channel})
 
+
+class TaskRep(BaseModel):
+    datetime_execute = DateTimeField(default=datetime.now)
+    rep              = TextField(default='')
+
 class Task(BaseModel):
-    name   = CharField(null=False)
-    dev    = ForeignKeyField(Device, primary_key=False)
-    date   = CharField(null=False)
-    time   = CharField(null=False)
-    status = IntegerField(null=False)
-    msg    = TextField(default='')
-    req    = TextField(default='')
+    name           = CharField(null=False)
+    dev            = ForeignKeyField(Device, primary_key=False)
+    datetime_begin = DateTimeField(null=True)
+    datetime_end   = DateTimeField(null=True)
+    cron_str       = CharField(default='* * * * *')
+    status         = IntegerField(default=TaskStatusType.Pending.value)
+    msg            = TextField(null=False)
+    rep            = ForeignKeyField(TaskRep, related_name='replies', null=True)
+    datetime_next  = DateTimeField(null=True)
+    series         = BooleanField(default=False)
+
+    def get_to_execute(self):
+
+        return False
 
     def get_json(self):
-        return ({"name":task.name,
-                 "id":task.id,
-                 "dev":task.dev.id,
-                 "date":task.date,
-                 "time":task.time,
-                 "status":task.status,
-                 "msg":task.msg,
-                 "reg":task.req})
+        return 'ok''''({"name":self.name,
+                 "id":self.id,
+                 "dev_name":self.dev.name,
+
+                 "date_begin":self.date_begin,
+                 "date_end":self.date_end,
+
+                 "time_begin":self.time_begin,
+                 "time_end":self.time.end,
+
+                 "minutes":self.minutes,
+                 "hours":self.hours,
+                 "month_days":self.month_days,
+                 "months":self.months,
+                 "week_days":week_days,
+
+                 "status":TaskStatusType(self.status).name,
+                 "msg":self.msg)}
+'''
+
 
 class Log(BaseModel):
     date_time = DateTimeField(default=datetime.now)

@@ -3,13 +3,13 @@ from flask import Flask
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
 from base_interface import *
-#from maincore import *
+from maincore import *
 from system_interface import system_interface
 import datetime
 import json
 
 app = Flask(__name__)
-#core = maincore(name, user, password, host)
+core = maincore()
 system = system_interface()
 
 @app.route('/api/dev', methods=['POST', 'GET'])
@@ -21,7 +21,7 @@ def add_device():
                         lan_address=dev["lan_address"],
                         lan_port=dev["lan_port"],
                         ps_channel=dev["ps_channel"])
-        log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was added".format(new_dev.name))
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added".format(new_dev.name))
     ret = []
     for dev in Device.select():
         ret.append (dev.get_json())
@@ -30,7 +30,7 @@ def add_device():
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
 def del_device(dev_id):
     dev = Device.select().where(Device.id == dev_id).get()
-    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} device was deleted".format(dev.name))
+    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was deleted".format(dev.name))
     dev.delete_instance()
     ret = []
     for dev in Device.select():
@@ -56,15 +56,21 @@ def get_ver():
 def add_task():
     if request.method == 'POST':
         task = json.loads(request.data)
-        inst_dev = Device.select().where(Device.id == task["dev"]).get()
-        new_task = Task.create(name=task["name"], 
-                        time=task["time"],
-                        date=task["date"],
-                        status=TaskStatusType.PENDING.value,
-                        msg=task["msg"],
-                        dev=inst_dev)
-        log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} task was added".format(new_task.name))
-        log.save()
+        print task
+        new_task = Task(name           = task["name"],
+                        dev            = Device.select().where(Device.id == task["dev"]).get(), 
+                        msg            = task["msg"],
+                        datetime_begin = task['datetime_begin'])
+
+        if 'datetime_end' in task:
+            new_task.datetime_begin = task['datetime_end']
+
+        if 'series' in task:
+            new_task.series = task['series']
+
+        new_task.datetime_next = task['datetime_begin']
+        new_task.save()
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was added".format(new_task.name))
     ret = []
     for task in Task.select():
         ret.append(task.get_json())
@@ -73,7 +79,7 @@ def add_task():
 @app.route('/api/task/<task_id>', methods=['DELETE'])
 def del_task(task_id):
     task = Task.select().where(Task.id == task_id).get()
-    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="{} task was deleted".format(task.name))
+    Log.create(source=LogSourceType.SERVER.value, types=LogType.Info.value, msg="{} task was deleted".format(task.name))
     task.delete_instance()
     ret = []
     for task in Task.select():
@@ -104,19 +110,21 @@ def shutdown_server():
 @app.route('/api/sys/shutdown', methods=['POST'])
 def shutdown():
     shutdown_server()
-    #core.join()
-    log = Log(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="Server is down")
-    log.save()  
+    core.exit_signal = True
+    core.join()
+    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is down")  
     base.close()
     return 'Server shutting down...'
  
 def main():
-        #core.start()
     base.connect()
-    base.create_tables([Device, Task, Log, ServerVer])
-    log = Log.create(source=LogSourceType.SERVER.value, types=LogType.LOG.value, msg="Server is up")
+    base.create_tables([Device, Task, Log, ServerVer, TaskRep])
+    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is up")
     ver = ServerVer.create(major=1, minor=0, runtime=0)
-    app.run()
+    core.start()
+
+    app.run(host='0.0.0.0', port=5000, debug=False)
+#    app.run()
 
 if __name__ == "__main__":
     main()

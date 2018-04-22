@@ -1,34 +1,67 @@
-<h1>System</h1>
 
-<button type="submit" ng-click="sysShutdown()">Shutdown</button>
+    <div class="panel panel-info">
+        <div class="panel-heading"><h4>System state</h4></div>
+        <div class="panel-body">
+
 <br>
-<br>
+<div class="panel panel-default">
+    <div class="panel-heading">App</div>
+        <div class="panel-body">
+            Server time:{{verData.server_time}}<br>
+            Version: {{verData.major}}.{{verData.minor}}.{{verData.runtime}}<br>
+            Uptime: {{sysData.uptime}}<br>
+            Boot time: {{sysData.boot_time}}<br>
+        </div>
+    </div>
 
-<h2>App</h2>
-Version: {{verData.major}}.{{verData.minor}}.{{verData.runtime}}<br>
-Uptime: {{sysData.uptime}}<br>
-Boot time: {{sysData.boot_time}}<br>
 
-<h2>Platform</h2>
-{{sysData.version}}<br>
-{{sysData.machine}}<br>
+<div class="panel panel-default">
+    <div class="panel-heading">Platform</div>
+        <div class="panel-body">
+            OS: {{sysData.version}}<br>
+            Plat: {{sysData.machine}}<br>
+        </div>
+    </div>
 
-<h2>Memory</h2>
-Used space: {{sysData.mem_used}}<br>
-Free space: {{sysData.mem_free}}<br>
-Total space: {{sysData.mem_total}}<br>
-Used space: {{sysData.mem_percent}}%<br>
-<progress value="{{sysData.mem_percent}}" max="100"></progress>
 
-<h2>Disk</h2>
-Used space: {{sysData.disk_used}}<br>
-Free space: {{sysData.disk_free}}<br>
-Total space: {{sysData.disk_total}}<br>
-Used space: {{sysData.disk_percent}}%<br>
-<progress value="{{sysData.disk_percent}}" max="100"></progress>
+<div class="panel panel-default">
+    <div class="panel-heading">Memory</div>
+        <div class="panel-body">
+            Used space: {{sysData.mem_used}}<br>
+            Free space: {{sysData.mem_free}}<br>
+            Total space: {{sysData.mem_total}}<br>
+            Used space:
+            <div class="progress">
+                <div class="progress-bar" style="width:{{sysData.mem_percent}}%">{{sysData.mem_percent}}%</div>
+            </div>
+        </div>
+    </div>
 
-<h2>CPU</h2>
-Usage:             {{sysData.cpu_usage}}<br>
-Max frequency:     {{sysData.cpu_freq_max}}<br>
-Min frequency:     {{sysData.cpu_freq_min}}<br>
-Current frequency: {{sysData.cpu_freq_curr}}<br>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Disk</div>
+        <div class="panel-body">
+            Used space: {{sysData.disk_used}}<br>
+            Free space: {{sysData.disk_free}}<br>
+            Total space: {{sysData.disk_total}}<br>
+            Used space:
+            <div class="progress">
+                <div class="progress-bar" style="width:{{sysData.disk_percent}}%">{{sysData.disk_percent}}%</div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">Cpu</div>
+        <div class="panel-body">
+            Usage:             {{sysData.cpu_usage}}<br>
+            Max frequency:     {{sysData.cpu_freq_max}}<br>
+            Min frequency:     {{sysData.cpu_freq_min}}<br>
+            Current frequency: {{sysData.cpu_freq_curr}}<br>
+        </div>
+    </div>
+<button type="submit" class="btn btn-danger" ng-click="sysShutdown()">Shutdown</button>
+</div>
+</div>
+

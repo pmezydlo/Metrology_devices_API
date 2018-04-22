@@ -1,23 +1,29 @@
 <!doctype html>
 <html ng-app="myApp">
     <head> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
         <script src="/static/lib/angular.min.js"></script>  
         <script src="/static/lib/angular-route.min.js"></script>
         <script src="/static/js/app.js"></script>
-	<link rel="stylesheet" href="/static/css/style.css" />
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <!--	<link rel="stylesheet" href="/static/css/style.css" />-->
     </head>
-    <body ng-controller="mainController">
-        <h1>Metrology device</h1>
-        <ul>
-            <li><a href="/#/">home page</a></li>
-            <li><a href="/#/sys">sys page</a></li>
-            <li><a href="/#/log">log page</a></li>
-	        <li><a href="/#/dev">dev page</a></li>
-            <li><a href="/#/task">task page</a></li>
-            <li>{% raw %} <p>{{status}} </p>{% endraw %}</li>
-         <!--   <li><p>{% raw %}Core is alive:{{sys.core_run}}{% endraw %} </p></li>
-            <li><p>{% raw %}Runing task:{{sys.task_counter}}{% endraw %}</p></li>-->
-        </ul>
+    <body ng-controller="mainController">      
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/#/">Web</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/#/">Home</a></li>
+                    <li><a href="/#/sys">System state</a></li>
+                    <li><a href="/#/log">Logs</a></li>
+                    <li><a href="/#/dev">Devices</a></li>
+                    <li><a href="/#/task">Task</a></li>
+                </ul>
+            </div>
+        </nav>        
         <div ng-view></div>
     </body>
 </html>
