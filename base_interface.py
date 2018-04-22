@@ -30,6 +30,7 @@ class TaskStatusType(Enum):
     Pending = 0
     Run     = 1
     Ready   = 2
+    Error   = 3
 
 class BaseModel(Model):
     class Meta:
@@ -87,9 +88,35 @@ class Task(BaseModel):
     datetime_next  = DateTimeField(null=True)
     series         = BooleanField(default=False)
 
-    def get_to_execute(self):
+    def ready_to_execute(self):
+        if self.status == TaskStatusType.Pending.value:
+            if self.datetime_next < datetime.now():
+                if self.series == True:
+                    iter  = croniter(self.cron_str, self.datetime_next) 
+                    self.datetime_next = iter.get_next(datetime)
+                    return True
+                else:
+                    return True
+            else:
+                return False
+        else:
+            return False
 
-        return False
+    def update_status(self, state):
+        if state == TaskStatusType.Run.value:
+            self.status = TaskStatusType.Run.value
+        elif state == TaskStatusType.Ready.value:
+            if self.series == False:
+                self.status = TaskStatusType.Ready.value
+            else:
+                if self.datetime_end < self.datetime_next:
+                    self.status = TaskStatusType.Ready.value
+                else:
+                    print "still pending"
+                    self.status = TaskStatusType.Pending.value
+        else:
+            self.status = TaskStatusType.Error.value
+        self.save()
 
     def get_json(self):
         return 'ok''''({"name":self.name,
@@ -111,7 +138,6 @@ class Task(BaseModel):
                  "status":TaskStatusType(self.status).name,
                  "msg":self.msg)}
 '''
-
 
 class Log(BaseModel):
     date_time = DateTimeField(default=datetime.now)

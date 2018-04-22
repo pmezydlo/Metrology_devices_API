@@ -1,11 +1,10 @@
 from flask import render_template, request
 from flask import Flask
 from playhouse.shortcuts import model_to_dict, dict_to_model
-
+from datetime import datetime
 from base_interface import *
 from maincore import *
 from system_interface import system_interface
-import datetime
 import json
 
 app = Flask(__name__)
@@ -60,15 +59,15 @@ def add_task():
         new_task = Task(name           = task["name"],
                         dev            = Device.select().where(Device.id == task["dev"]).get(), 
                         msg            = task["msg"],
-                        datetime_begin = task['datetime_begin'])
+                        datetime_begin = datetime.strptime(task["datetime_begin"], '%d/%m/%Y %H:%M'))
 
         if 'datetime_end' in task:
-            new_task.datetime_begin = task['datetime_end']
+            new_task.datetime_end = datetime.strptime(task["datetime_end"], '%d/%m/%Y %H:%M')
 
         if 'series' in task:
             new_task.series = task['series']
 
-        new_task.datetime_next = task['datetime_begin']
+        new_task.datetime_next = new_task.datetime_begin
         new_task.save()
         Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was added".format(new_task.name))
     ret = []
@@ -129,13 +128,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-# TODO:
-#
-# 1. system statistics
-# 2. device suport (hardcode basic device function)
-# 3. add triggering task after each (day, hour, minutes etc.)
-# 4. data base optimizations
-#
-#
 
 
