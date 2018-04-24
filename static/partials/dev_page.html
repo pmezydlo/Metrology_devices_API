@@ -12,6 +12,11 @@
                             <th>IP</th>
                             <th>Port</th>
                             <th>Number of PS channel</th>
+                            <th>Manufacturer</th>
+                            <th>Device</th>
+                            <th>Serial number</th>
+                            <th>Firmware version</th>
+                            <th>Online</th>
                             <th></th>
                         </tr> 
                     </thead>
@@ -23,6 +28,11 @@
                             <td> {{dev.lan_address}}</td>
                             <td> {{dev.lan_port}}</td>
                             <td> {{dev.ps_channel}}</td>
+                            <td> {{dev.manufacturer}}</td>
+                            <td> {{dev.device}}</td>
+                            <td> {{dev.serial_num}}</td>
+                            <td> {{dev.firm_ver}}</td>
+                            <td> {{dev.online}}</td>
                             <td><button class="btn btn-danger" type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
                         </tr>
                     </tbody>

@@ -60,8 +60,31 @@ class Device(BaseModel):
     lan_port    = IntegerField(default=5555)
     ps_channel  = IntegerField(default=0)
 
-    ping        = 0
-    online      = False
+    online       = BooleanField(default=False)
+    manufacturer = CharField(default="")
+    device       = CharField(default="")
+    serial_num   = CharField(default="")
+    firm_ver     = CharField(default="")
+
+    def update_info(self, idn_str):
+       idn_str_split = idn_str.split(",")
+       if idn_str_split[0] != self.manufacturer or idn_str_split[1] != self.device or idn_str_split[2] != self.serial_num or idn_str_split[3] != self.firm_ver:
+           self.manufacturer = idn_str_split[0]
+           self.device       = idn_str_split[1]
+           self.serial_num   = idn_str_split[2]
+           self.firm_ver     = idn_str_split[3]
+           self.save()
+           ver = ServerVer.select().get()
+           ver.inc_runtime()
+
+    def update_online(self, online):
+        if self.online != online:
+            self.online = online
+            self.save()
+            ver = ServerVer.select().get()
+            ver.inc_runtime()
+
+
 
     def get_json(self):
         return ({"id":self.id,
@@ -69,11 +92,16 @@ class Device(BaseModel):
                  "types":DeviceType(self.types).name,
                  "lan_address":self.lan_address,
                  "lan_port":self.lan_port,
-                 "ps_channel":self.ps_channel})
-
+                 "ps_channel":self.ps_channel,
+                 "online":self.online,
+                 "manufacturer":self.manufacturer,
+                 "device":self.device,
+                 "serial_num":self.serial_num,
+                 "firm_ver":self.firm_ver
+                 })
 
 class TaskRep(BaseModel):
-    datetime_execute = DateTimeField(default=datetime.now)
+    datetime_execute = DateTimeField(default=datetime.now())
     rep              = TextField(default='')
 
 class Task(BaseModel):
@@ -112,7 +140,6 @@ class Task(BaseModel):
                 if self.datetime_end < self.datetime_next:
                     self.status = TaskStatusType.Ready.value
                 else:
-                    print "still pending"
                     self.status = TaskStatusType.Pending.value
         else:
             self.status = TaskStatusType.Error.value
