@@ -1,4 +1,3 @@
-[
   {"dev_type":"DS1000",
    "info":"SCPI commands to realize remote control of RIGOL MSO1000Z/DS1000Z series digital oscilloscope through the remote interface.",
    "cmd_group_lv1":[
@@ -33,13 +32,5 @@
       {"cmd":":BW", "info":"dessc4", "param":"?,sa"},
       {"cmd":":COUP", "info":"dessc4"}
     ]}
-  ]},
-  {"dev_type":"DS2000", "cmd_group_lv1":[
-    {"cmd":":AUT", "info":"desc"},
-    {"cmd":":CLE", "info":"desc2"},
-    {"cmd":":RUN", "info":"desc3"},
-    {"cmd":":STOP", "info":"desc4"},
-    {"cmd":":SING", "info":"desc2"},
-    {"cmd":":TFOR", "info":"desc2"}
   ]}
-]
+

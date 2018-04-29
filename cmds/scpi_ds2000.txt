@@ -1,0 +1,10 @@
+
+  {"dev_type":"DS2000", "cmd_group_lv1":[
+    {"cmd":":AUT", "info":"desc"},
+    {"cmd":":CLE", "info":"desc2"},
+    {"cmd":":RUN", "info":"desc3"},
+    {"cmd":":STOP", "info":"desc4"},
+    {"cmd":":SING", "info":"desc2"},
+    {"cmd":":TFOR", "info":"desc2"}
+  ]}
+

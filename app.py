@@ -6,6 +6,7 @@ from base_interface import *
 from maincore import *
 from system_interface import system_interface
 import json
+import os
 
 app = Flask(__name__)
 core = maincore()
@@ -28,9 +29,10 @@ def add_device():
 
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():
-    with open('scpi_cmd.txt') as cmd_json_data:
-        cmds = json.load(cmd_json_data)
-        print cmds
+    cmds = []
+    for filename in os.listdir('cmds/'):
+        with open('cmds/'+filename) as cmd_json_data:
+            cmds.append(json.load(cmd_json_data))
     return json.dumps(cmds)
 
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
