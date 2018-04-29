@@ -191,6 +191,18 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         });
     };
 
+    $scope.detectDev = () => {
+        $http.post('/api/detectDev', $scope.formData)
+        .success((data) => {
+            $scope.formData = {};
+            $scope.devData = data;
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
     $scope.sysStop = () => {
         $http.post('/api/sys/stop')
         .success((data) => {

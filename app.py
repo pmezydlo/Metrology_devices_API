@@ -7,6 +7,7 @@ from maincore import *
 from system_interface import system_interface
 import json
 import os
+import vxi11
 
 app = Flask(__name__)
 core = maincore()
@@ -17,15 +18,29 @@ def add_device():
     if request.method == 'POST':
         dev = json.loads(request.data)
         new_dev = Device.create(name=dev["name"],
-                        types=dev["types"], 
                         lan_address=dev["lan_address"],
-                        lan_port=dev["lan_port"],
                         ps_channel=dev["ps_channel"])
         Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added".format(new_dev.name))
     ret = []
     for dev in Device.select():
         ret.append (dev.get_json())
     return json.dumps(ret)
+
+@app.route('/api/detectDev', methods=['POST'])
+def autodetect_device():
+    print "detect"
+    list_of_dev = vxi11.list_devices()
+    for dev in list_of_dev:
+        print dev
+        new_dev = Device.create(name="device",
+                        lan_address=dev,
+                        ps_channel=0)
+
+    ret = []
+    for dev in Device.select():
+        ret.append (dev.get_json())
+    return json.dumps(ret)
+
 
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():

@@ -8,12 +8,6 @@ from croniter import croniter
 
 base = SqliteDatabase('MDA.db')
 
-class DeviceType(Enum):
-    NotDefined         = 0
-    Oscilloscope       = 1
-    Multimeter         = 2
-    FunctionGenerator  = 3
-
 class LogType(Enum):
     Info    = 0
     Warning = 1
@@ -55,9 +49,7 @@ class ServerVer(BaseModel):
 class Device(BaseModel):
     id          = PrimaryKeyField(null=False)
     name        = CharField(null=False)
-    types       = IntegerField(null=False)
     lan_address = CharField(null=False)
-    lan_port    = IntegerField(default=5555)
     ps_channel  = IntegerField(default=0)
 
     online       = BooleanField(default=False)
@@ -84,14 +76,10 @@ class Device(BaseModel):
             ver = ServerVer.select().get()
             ver.inc_runtime()
 
-
-
     def get_json(self):
         return ({"id":self.id,
                  "name":self.name,
-                 "types":DeviceType(self.types).name,
                  "lan_address":self.lan_address,
-                 "lan_port":self.lan_port,
                  "ps_channel":self.ps_channel,
                  "online":self.online,
                  "manufacturer":self.manufacturer,
