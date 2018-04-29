@@ -24,7 +24,14 @@ def add_device():
     ret = []
     for dev in Device.select():
         ret.append (dev.get_json())
-    return json.dumps(ret) 
+    return json.dumps(ret)
+
+@app.route('/api/cmds', methods=['GET'])
+def get_cmds():
+    with open('scpi_cmd.txt') as cmd_json_data:
+        cmds = json.load(cmd_json_data)
+        print cmds
+    return json.dumps(cmds)
 
 @app.route('/api/dev/<dev_id>', methods=['DELETE'])
 def del_device(dev_id):
@@ -55,7 +62,6 @@ def get_ver():
 def add_task():
     if request.method == 'POST':
         task = json.loads(request.data)
-        print task
         new_task = Task(name           = task["name"],
                         dev            = Device.select().where(Device.id == task["dev"]).get(), 
                         msg            = task["msg"],
@@ -121,12 +127,8 @@ def main():
     Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is up")
     ver = ServerVer.create(major=1, minor=0, runtime=0)
     core.start()
-
     app.run(host='0.0.0.0', port=5000, debug=False)
-#    app.run()
 
 if __name__ == "__main__":
     main()
-
-
 

@@ -31,16 +31,54 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
 
     $scope.formData = {};
     $scope.devData = {};
-    $scope.newStatus = 'RUN';
     $scope.logsData = {};
     $scope.sysData = {};
 
     $scope.taskData = {};
     $scope.taskFormData = {};
+    $scope.taskFormData.msg = '';
     $scope.verData = {};
+
+    $scope.sel_dev  = {};
+    $scope.cmds = {};
+    $scope.formCmdData = {};
 
     $scope.status = 'Current';
     var runtime_ver = 0;
+
+    $scope.add = () => {
+        var cmd_str = '';
+
+        if ("sel_cmd_lv1" in $scope.formCmdData) { 
+            if ("cmd" in $scope.formCmdData.sel_cmd_lv1) {
+                cmd_str += $scope.formCmdData.sel_cmd_lv1.cmd;
+                if ("sel_param_lv1" in $scope.formCmdData) {
+                    cmd_str += $scope.formCmdData.sel_param_lv1;
+                }
+            }
+        }
+
+        if ("sel_cmd_lv2" in $scope.formCmdData) { 
+            if ("cmd" in $scope.formCmdData.sel_cmd_lv2) {
+                cmd_str += $scope.formCmdData.sel_cmd_lv2.cmd;
+                if ("sel_param_lv2" in $scope.formCmdData) {
+                    cmd_str += $scope.formCmdData.sel_param_lv2;
+                }
+            }
+        }
+
+        if ("sel_cmd_lv3" in $scope.formCmdData) { 
+            if ("cmd" in $scope.formCmdData.sel_cmd_lv3) {
+                cmd_str += $scope.formCmdData.sel_cmd_lv3.cmd;
+                if ("sel_param_lv3" in $scope.formCmdData) {
+                    cmd_str += $scope.formCmdData.sel_param_lv3;
+                }
+            }
+        }
+
+        $scope.taskFormData.msg += cmd_str+'\n';
+        console.log(cmd_str);
+    };
 
     function get_data() {
         $http.get('/api/task')
@@ -88,6 +126,16 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         console.log('Error: ' + error);
     });
     }
+
+    $http.get('/api/cmds')
+    .success((data) => {
+        $scope.cmds = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+ 
 
     var timer_fun = function() {
         $http.get('/api/ver')

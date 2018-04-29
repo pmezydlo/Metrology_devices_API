@@ -1,0 +1,45 @@
+[
+  {"dev_type":"DS1000",
+   "info":"SCPI commands to realize remote control of RIGOL MSO1000Z/DS1000Z series digital oscilloscope through the remote interface.",
+   "cmd_group_lv1":[
+    {"cmd":":AUT",
+     "info":"Enable the waveform auto setting function. The oscilloscope will automatically adjust the vertical scale, horizontal timebase, and trigger mode according to the input signal to realize optimum waveform display."},
+    {"cmd":":CLE",
+     "info":"Clear all the waveforms on the screen. If the oscilloscope is in the RUN state, waveform will still be displayed."},
+    {"cmd":":RUN",
+     "info":"The :RUN command starts the oscilloscope."},
+    {"cmd":":STOP",
+     "info":"The :STOP command stops the oscilloscope."},
+    {"cmd":":SING", 
+     "info":"Set the oscilloscope to the single trigger mode."},
+    {"cmd":":TFOR", "info":"Generate a trigger signal forcefully."},
+    {"cmd":":ACQ",
+     "info":"The :ACQuire commands are used to set and query the memory depth, acquisition mode and the number of averages as well as query the current sample rate of the oscilloscope.", 
+     "cmd_group_lv2":[
+      {"cmd":":AVER",
+       "info":"Set or query the number of averages under the average acquisition mode.",
+       "param_lv2":[
+         {"param":"?", "info":"Query the number of averages under the average acquisition mode."},
+         {"param":" 2", "info":"Set the number of averages under the average acquisition mode."}]},
+      {"cmd":":MDEP", "info":"dessc4"},
+      {"cmd":":TYPE", "info":"dessc4"},
+      {"cmd":":SRAT", "info":"dessc4"}
+      ]},
+    {"cmd":":CAL", "info":"desc2", "cmd_group_lv2":[
+      {"cmd":":QUIT", "info":"dessc4"},
+      {"cmd":":STAR", "info":"dessc4"}
+      ]},
+    {"cmd":":CHAN", "info":"desc2", "param":"<chan number>", "cmd_group_lv2":[
+      {"cmd":":BW", "info":"dessc4", "param":"?,sa"},
+      {"cmd":":COUP", "info":"dessc4"}
+    ]}
+  ]},
+  {"dev_type":"DS2000", "cmd_group_lv1":[
+    {"cmd":":AUT", "info":"desc"},
+    {"cmd":":CLE", "info":"desc2"},
+    {"cmd":":RUN", "info":"desc3"},
+    {"cmd":":STOP", "info":"desc4"},
+    {"cmd":":SING", "info":"desc2"},
+    {"cmd":":TFOR", "info":"desc2"}
+  ]}
+]

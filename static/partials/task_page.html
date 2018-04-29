@@ -41,21 +41,98 @@
                 <div class="form-group">
                     <div class="panel panel-info"> 
                         <div class="panel-heading">Commands</div>
-                        <div class="panel-body">
-                        <select class="form-control" ng-model="formData.types" id="type" style="width:;">
-                            <option>*IDN?</option>
-                            <option>*SDA</option>
-                            <option>*ASD</option>
-                            <option>ASDA</option>
-                        </select>
-                    <button class="btn-primary btn-block" type="button">Add</button> 
-                    </div>
+                        <div class="panel-body"> 
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%">
+                                            Group
+                                        </th>
+                                        <th style="width: 15%">
+                                            Cmd lvl. 1
+                                        </th>
+                                        <th style="width: 15%">
+                                            Parameter
+                                        </th>
+                                        <th style="width: 15%">
+                                            Cmd lvl. 2
+                                        </th>
+                                        <th style="width: 15%">
+                                            Parameter
+                                        </th>
+                                        <th style="width: 15%">
+                                            Cmd lvl. 3
+                                        </th>
+                                        <th style="width: 15%">
+                                            Parameter
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <select  class="form-control"
+                                                ng-options="option.dev_type for option in cmds track by option.cmd_group_lv1"
+                                                ng-model="sel_dev"></select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" 
+                                                ng-options="option.cmd for option in sel_dev.cmd_group_lv1 track by option.cmd"
+                                                ng-model="formCmdData.sel_cmd_lv1"></select>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" type="text" list="param_list_lv1" ng-model="formCmdData.sel_param_lv1">
+                                                <datalist id="param_list_lv1">
+                                                    <option ng-repeat="p1 in fromCmdData.sel_cmd_lv1.param_lv1" placeholder="" value="{{p1.param}}">{{p1.param}}</option>
+                                                </datalist>
+                                            </input>
+                                        </td>
+                                        <td>
+                                            <select class="form-control"
+                                                ng-options="option.cmd for option in formCmdData.sel_cmd_lv1.cmd_group_lv2 track by option.cmd"
+                                                ng-model="formCmdData.sel_cmd_lv2"></select>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" type="text" list="param_list_lv2" ng-model="formCmdData.sel_param_lv2">
+                                                <datalist id="param_list_lv2">
+                                                    <option ng-repeat="p2 in formCmdData.sel_cmd_lv2.param_lv2" placeholder="" value="{{p2.param}}">{{p2.param}}</option>
+                                                </datalist>
+                                            </input>
+                                        </td>
+                                        <td>
+                                            <select class="form-control"
+                                                ng-options="option.cmd for option in formCmdData.sel_cmd_lv2.cmd_group_lv3 track by option.cmd"
+                                                ng-model="formCmdData.sel_cmd_lv3"></select>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" type="text" list="param_list_lv3" ng-model="formCmdData.sel_param_lv3">
+                                                <datalist id="param_list_lv3">
+                                                    <option ng-repeat="p1 in formCmdData.sel_cmd_lv3.param_lv3" placeholder="" value="{{p3.param}}">{{p3.param}}</option>
+                                                </datalist>
+                                            </input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {{sel_dev.info}}
+                                        </td>
+                                        <td colspan="2">
+                                            {{formCmdData.sel_cmd_lv1.info}}
+                                        </td>
+                                        <td colspan="2">
+                                            {{formCmdData.sel_cmd_lv2.info}}
+                                        </td>                                        
+                                        <td colspan="2">
+                                            {{formCmdData.sel_cmd_lv3.info}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="btn-primary btn-block" type="button" ng-click="add()">Add</button> 
+                        </div>
                     </div>
                 </div>
-
                 <button type="submit" class="btn btn-primary" ng-click="createTask()">Submit</button>
             </div>
         </div>
-
-
 </div>
