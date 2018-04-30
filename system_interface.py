@@ -11,7 +11,7 @@ class system_interface(object):
         pass
 
     def bytes_2_human_readable(self, n):
-        symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+        symbols = ('KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
         prefix = {}
         for i, s in enumerate(symbols):
             prefix[s] = 1 << (i + 1) * 10
@@ -21,6 +21,15 @@ class system_interface(object):
                 return '%.1f%s' % (value, s)
         return "%sB" % n
 
+    def get_file_info(self):
+        ret_file = []
+        ret_size = []
+        for file in os.listdir("files/"):
+            ret_file.append(file)
+            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join("files/", file))))
+        ret = [{"name": f, "size": s} for f, s in zip(ret_file, ret_size)]
+        return ret
+
     def get_system_information(self):
         json_info = {}
         json_info['system']  = platform.system()
@@ -29,14 +38,14 @@ class system_interface(object):
         json_info['machine'] = platform.machine()
 
         json_info['mem_percent'] = str(psutil.virtual_memory().percent)
-        json_info['mem_used']    = self.bytes_2_human_readable(psutil.virtual_memory().used)+"B"
-        json_info['mem_total']   = self.bytes_2_human_readable(psutil.virtual_memory().total)+"B"
-        json_info['mem_free']    = self.bytes_2_human_readable(psutil.virtual_memory().free)+"B"
+        json_info['mem_used']    = self.bytes_2_human_readable(psutil.virtual_memory().used)
+        json_info['mem_total']   = self.bytes_2_human_readable(psutil.virtual_memory().total)
+        json_info['mem_free']    = self.bytes_2_human_readable(psutil.virtual_memory().free)
 
         json_info['disk_percent'] = str(psutil.disk_usage('/').percent)
-        json_info['disk_used']    = self.bytes_2_human_readable(psutil.disk_usage('/').used)+"B"
-        json_info['disk_total']   = self.bytes_2_human_readable(psutil.disk_usage('/').total)+"B"
-        json_info['disk_free']    = self.bytes_2_human_readable(psutil.disk_usage('/').free)+"B"
+        json_info['disk_used']    = self.bytes_2_human_readable(psutil.disk_usage('/').used)
+        json_info['disk_total']   = self.bytes_2_human_readable(psutil.disk_usage('/').total)
+        json_info['disk_free']    = self.bytes_2_human_readable(psutil.disk_usage('/').free)
 
         json_info['uptime'] = str(datetime.timedelta(seconds=(int(time.time() - psutil.boot_time()))))
         json_info['boot_time'] = str(datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"))
@@ -62,7 +71,7 @@ class system_interface(object):
         json_info['cpu_freq_max'] = cpu_max_str
         json_info['cpu_freq_min'] = cpu_min_str
         json_info['cpu_freq_curr'] = cpu_freq_str
-
+        json_info['user_files'] = self.get_file_info()
         return json.dumps(json_info)
 
     def get_ping(self, ip):
@@ -72,5 +81,4 @@ class system_interface(object):
         else:
             status = "is down"
         return status
-
 

@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, send_from_directory
 from flask import Flask
 from playhouse.shortcuts import model_to_dict, dict_to_model
 from datetime import datetime
@@ -28,14 +28,14 @@ def add_device():
 
 @app.route('/api/detectDev', methods=['POST'])
 def autodetect_device():
-    print "detect"
     list_of_dev = vxi11.list_devices()
     for dev in list_of_dev:
-        print dev
-        new_dev = Device.create(name="device",
-                        lan_address=dev,
-                        ps_channel=0)
-
+        query = Device.select().where(Device.lan_address == dev)
+        if not query.exists():
+            new_dev = Device.create(name="device",
+                lan_address=dev,
+                ps_channel=0)
+            Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added by auto-detection".format(new_dev.name))
     ret = []
     for dev in Device.select():
         ret.append (dev.get_json())
@@ -137,7 +137,13 @@ def shutdown():
     Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is down")  
     base.close()
     return 'Server shutting down...'
- 
+
+@app.route('/files/<path:path>')
+def send_html(path):
+    print path
+    print "download"
+    return send_from_directory('files', path)
+
 def main():
     base.connect()
     base.create_tables([Device, Task, Log, ServerVer, TaskRep])

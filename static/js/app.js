@@ -22,6 +22,9 @@ myApp.config(['$routeProvider',
             when('/task', {
                 templateUrl: '../static/partials/task_page.html',
             }).
+            when('/files', {
+                templateUrl: '../static/partials/files_page.html',
+            }).
             otherwise({
                 redirectTo: '/'
             });

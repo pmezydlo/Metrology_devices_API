@@ -1,0 +1,21 @@
+       <div class="system_files">
+            <div class="panel panel-info">
+                <div class="panel-heading"><h4>Files</h4></div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Size</th>
+                            </tr> 
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="file in sysData.user_files">
+                                <td> <a href="/files/{{file.name}}">{{file.name}}</a></td>
+                                <td> {{file.size}}</td>
+                            </tr>
+                        </tbody>
+                    </table>                    
+                </div>
+            </div>
+        </div>
