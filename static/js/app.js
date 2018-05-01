@@ -49,7 +49,7 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
     $scope.status = 'Current';
     var runtime_ver = 0;
 
-    $scope.add = () => {
+    $scope.addCmd = () => {
         var cmd_str = '';
 
         if ("sel_cmd_lv1" in $scope.formCmdData) { 
@@ -81,6 +81,21 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
 
         $scope.taskFormData.msg += cmd_str+'\n';
         console.log(cmd_str);
+    };
+
+    $scope.addEntryPoint = () => {
+        var cmd_str = '';
+
+        if ("sel_entry" in $scope.formCmdData) { 
+            cmd_str += $scope.formCmdData.sel_entry.name;
+            cmd_str += '(';
+            if ("sel_entry_arg" in $scope.formCmdData) {
+                cmd_str += $scope.formCmdData.sel_entry_arg;
+            }
+            cmd_str += ')';
+            $scope.taskFormData.msg += cmd_str+'\n';
+            console.log(cmd_str);
+        }
     };
 
     function get_data() {

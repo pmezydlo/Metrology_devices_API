@@ -18,8 +18,7 @@ def add_device():
     if request.method == 'POST':
         dev = json.loads(request.data)
         new_dev = Device.create(name=dev["name"],
-                        lan_address=dev["lan_address"],
-                        ps_channel=dev["ps_channel"])
+                        lan_address=dev["lan_address"])
         Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added".format(new_dev.name))
     ret = []
     for dev in Device.select():
@@ -33,8 +32,7 @@ def autodetect_device():
         query = Device.select().where(Device.lan_address == dev)
         if not query.exists():
             new_dev = Device.create(name="device",
-                lan_address=dev,
-                ps_channel=0)
+                lan_address=dev)
             Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added by auto-detection".format(new_dev.name))
     ret = []
     for dev in Device.select():

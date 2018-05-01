@@ -50,7 +50,6 @@ class Device(BaseModel):
     id          = PrimaryKeyField(null=False)
     name        = CharField(null=False)
     lan_address = CharField(null=False)
-    ps_channel  = IntegerField(default=0)
 
     online       = BooleanField(default=False)
     manufacturer = CharField(default="")
@@ -80,7 +79,6 @@ class Device(BaseModel):
         return ({"id":self.id,
                  "name":self.name,
                  "lan_address":self.lan_address,
-                 "ps_channel":self.ps_channel,
                  "online":self.online,
                  "manufacturer":self.manufacturer,
                  "device":self.device,
