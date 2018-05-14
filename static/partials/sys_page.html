@@ -55,10 +55,27 @@
 <div class="panel panel-default">
     <div class="panel-heading">Cpu</div>
         <div class="panel-body">
-            Usage:             {{sysData.cpu_usage}}<br>
-            Max frequency:     {{sysData.cpu_freq_max}}<br>
-            Min frequency:     {{sysData.cpu_freq_min}}<br>
-            Current frequency: {{sysData.cpu_freq_curr}}<br>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>CPU</th>
+                            <th>Usage</th>
+                            <th>Current frequency</th>
+                            <th>Max frequency</th>
+                            <th>Min Frequency</th>
+                        </tr> 
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="cpu in sysData.cpu_info">
+                            <td> {{cpu.cpu}}</td>
+                            <td> {{cpu.usage}}%</td>
+                            <td> {{cpu.cur}}</td>
+                            <td> {{cpu.max}}</td>
+                            <td> {{cpu.min}}</td>
+                        </tr>
+                    </tbody>
+                </table>
         </div>
     </div>
 <button type="submit" class="btn btn-danger" ng-click="sysShutdown()">Shutdown</button>
