@@ -1,0 +1,40 @@
+       <div class="task_res">
+            <div class="panel panel-info">
+                <div class="panel-heading"><h4>Task Results</h4></div>
+                <div class="panel-body">
+                    <label>Search by task name:
+                    <input class="form-control" type="text" ng-model="searchTask">
+                    </input>
+                    </label>
+                    <label>Search by device name:
+                    <input class="form-control" type="text" ng-model="searchDev">
+                    </input>
+                    </label>
+                    <div ng-repeat="res in resultsData | filter: {'task' : searchTask, 'device' : searchDev}" class="panel panel-default">
+                        <div class="panel-heading">{{res.task}}</div>
+                        
+                        <div class="panel-body">
+                        <p>ID: {{res.id}}
+                        <p>Device name: {{res.device}}</p>
+                        <p>Execution data & time: {{res.date_time}}</p>
+                        <p>Status: {{res.status}}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Command</th>
+                                    <th>Response</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="cmd in res.resp">
+                                    <td> {{cmd.msg}}  </td>
+                                    <td> {{cmd.resp}} </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-danger" type="submit" ng-click="deleteRes(res.id)">Delete</button>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

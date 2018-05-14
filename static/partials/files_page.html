@@ -7,12 +7,14 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Size</th>
+                                <th></th>
                             </tr> 
                         </thead>
                         <tbody>
-                            <tr ng-repeat="file in sysData.user_files">
+                            <tr ng-repeat="file in fileData">
                                 <td> <a href="/files/{{file.name}}">{{file.name}}</a></td>
                                 <td> {{file.size}}</td>
+                                <td>  <button class="btn btn-danger" type="submit" ng-click="deleteFile(file.name)">Delete</button></td>
                             </tr>
                         </tbody>
                     </table>                    

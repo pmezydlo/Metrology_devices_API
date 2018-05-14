@@ -21,6 +21,9 @@ class system_interface(object):
                 return '%.1f%s' % (value, s)
         return "%sB" % n
 
+    def remove_file(self, name):
+        os.remove("files/"+name)
+
     def get_file_info(self):
         ret_file = []
         ret_size = []
@@ -48,8 +51,7 @@ class system_interface(object):
         json_info['disk_free']    = self.bytes_2_human_readable(psutil.disk_usage('/').free)
 
         json_info['uptime'] = str(datetime.timedelta(seconds=(int(time.time() - psutil.boot_time()))))
-        json_info['boot_time'] = str(datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"))
-
+        json_info['boot_time'] = str(datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%d/%m/%Y %H:%M:%S"))
 
         cpu_usage = psutil.cpu_percent(interval=0.1, percpu=True)
         cpu_usage_str = ""
@@ -71,8 +73,7 @@ class system_interface(object):
         json_info['cpu_freq_max'] = cpu_max_str
         json_info['cpu_freq_min'] = cpu_min_str
         json_info['cpu_freq_curr'] = cpu_freq_str
-        json_info['user_files'] = self.get_file_info()
-        return json.dumps(json_info)
+        return json_info
 
     def get_ping(self, ip):
         response = os.system("ping -c 1 "+ip)
@@ -81,4 +82,3 @@ class system_interface(object):
         else:
             status = "is down"
         return status
-

@@ -22,8 +22,14 @@ myApp.config(['$routeProvider',
             when('/task', {
                 templateUrl: '../static/partials/task_page.html',
             }).
+            when('/addtask', {
+                templateUrl: '../static/partials/add_task_page.html',
+            }).
             when('/files', {
                 templateUrl: '../static/partials/files_page.html',
+            }).
+            when('/res', {
+                templateUrl: '../static/partials/res_page.html',
             }).
             otherwise({
                 redirectTo: '/'
@@ -36,6 +42,8 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
     $scope.devData = {};
     $scope.logsData = {};
     $scope.sysData = {};
+    $scope.fileData = {};
+    $scope.resultsData = {};
 
     $scope.taskData = {};
     $scope.taskFormData = {};
@@ -117,6 +125,24 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         console.log('Error: ' + error);
     });
 
+    $http.get('/api/results')
+    .success((data) => {
+        $scope.resultsData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+
+    $http.get('/api/file')
+    .success((data) => {
+        $scope.fileData = data;
+        console.log(data);
+    })
+    .error((error) => {
+        console.log('Error: ' + error);
+    });
+
     $http.get('/api/sys/info')
     .success((data) => {
         $scope.sysData = data;
@@ -167,12 +193,12 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
                 $scope.status = 'Current';
             }
         })
-        $timeout(timer_fun, 500);
+        $timeout(timer_fun, 1000);
     }
 
-    $timeout(timer_fun, 500);
-    get_data();
-    
+    $timeout(timer_fun, 1000);
+    get_data()
+ 
     $scope.createTask = () => {
         $http.post('/api/task', $scope.taskFormData)
         .success((data) => {
@@ -209,11 +235,19 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         });
     };
 
+    $scope.checkDev = (devID) => {
+        $http.post('/api/checkDev/' + devID)
+        .success((data) => {
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
     $scope.detectDev = () => {
         $http.post('/api/detectDev', $scope.formData)
         .success((data) => {
-            $scope.formData = {};
-            $scope.devData = data;
             console.log(data);
         })
         .error((error) => {
@@ -262,6 +296,28 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         });
     };
 
+    $scope.deleteRes = (resID) => {
+        $http.delete('/api/results/' + resID)
+        .success((data) => {
+            $scope.resultsData = data;
+            console.log(data);
+        })
+        .error((data) => {
+        console.log('Error: ' + data);
+        });
+    };
+
+    $scope.deleteFile = (name) => {
+        $http.delete('/api/file/' + name)
+        .success((data) => {
+            $scope.fileData = data;
+            console.log(data);
+        })
+        .error((data) => {
+        console.log('Error: ' + data);
+        });
+    };
+
     $scope.deleteLogs = () => {
         $http.delete('/api/logs')
         .success((data) => {
@@ -272,6 +328,5 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         console.log('Error: ' + data);
         });
     };
-
 
 });

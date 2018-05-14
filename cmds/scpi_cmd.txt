@@ -1,40 +1,292 @@
-
-  {"dev_type":"DS1000",
+{
+   "dev_type":"DS1000",
    "info":"SCPI commands to realize remote control of RIGOL MSO1000Z/DS1000Z series digital oscilloscope through the remote interface.",
    "cmd_group_lv1":[
-    {"cmd":":AUT",
-     "info":"Enable the waveform auto setting function. The oscilloscope will automatically adjust the vertical scale, horizontal timebase, and trigger mode according to the input signal to realize optimum waveform display."},
-    {"cmd":":CLE",
-     "info":"Clear all the waveforms on the screen. If the oscilloscope is in the RUN state, waveform will still be displayed."},
-    {"cmd":":RUN",
-     "info":"The :RUN command starts the oscilloscope."},
-    {"cmd":":STOP",
-     "info":"The :STOP command stops the oscilloscope."},
-    {"cmd":":SING", 
-     "info":"Set the oscilloscope to the single trigger mode."},
-    {"cmd":":TFOR", "info":"Generate a trigger signal forcefully."},
-    {"cmd":":ACQ",
-     "info":"The :ACQuire commands are used to set and query the memory depth, acquisition mode and the number of averages as well as query the current sample rate of the oscilloscope.", 
-     "cmd_group_lv2":[
-      {"cmd":":AVER",
-       "info":"Set or query the number of averages under the average acquisition mode.",
-       "param_lv2":[
-         {"param":"?", "info":"Query the number of averages under the average acquisition mode."},
-         {"param":" 2", "info":"Set the number of averages under the average acquisition mode."}]},
-      {"cmd":":MDEP", "info":"dessc4"},
-      {"cmd":":TYPE", "info":"dessc4"},
-      {"cmd":":SRAT", "info":"dessc4"}
-      ]},
-    {"cmd":":CAL", "info":"desc2", "cmd_group_lv2":[
-      {"cmd":":QUIT", "info":"dessc4"},
-      {"cmd":":STAR", "info":"dessc4"}
-      ]},
-    {"cmd":":CHAN", "info":"desc2", "param":"<chan number>", "cmd_group_lv2":[
-      {"cmd":":BW", "info":"dessc4", "param":"?,sa"},
-      {"cmd":":COUP", "info":"dessc4"}
-    ]}
-  ],
-    "entry_point":[{"name":"delay", "info":"Delay next operation by seconds.", "arg_info":"Time in seconds"},
-      {"name":"screen", "info":"Getting print screen from oscilloscope.", "arg_info":"File name"}]
-  }
-
+      {
+         "cmd":":AUT",
+         "info":"Enable the waveform auto setting function. The oscilloscope will automatically adjust the vertical scale, horizontal timebase, and trigger mode according to the input signal to realize optimum waveform display."
+      },
+      {
+         "cmd":":CLE",
+         "info":"Clear all the waveforms on the screen. If the oscilloscope is in the RUN state, waveform will still be displayed."
+      },
+      {
+         "cmd":":RUN",
+         "info":"The :RUN command starts the oscilloscope."
+      },
+      {
+         "cmd":":STOP",
+         "info":"The :STOP command stops the oscilloscope."
+      },
+      {
+         "cmd":":SING",
+         "info":"Set the oscilloscope to the single trigger mode."
+      },
+      {
+         "cmd":":TFOR",
+         "info":"Generate a trigger signal forcefully."
+      },
+      {
+         "cmd":":ACQ",
+         "info":"The :ACQuire commands are used to set and query the memory depth, acquisition mode and the number of averages as well as query the current sample rate of the oscilloscope.",
+         "cmd_group_lv2":[
+            {
+               "cmd":":AVER",
+               "info":"Set or query the number of averages under the average acquisition mode.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  },
+                  {
+                     "param":" 128"
+                  }
+               ]
+            },
+            {
+               "cmd":":MDEP",
+               "info":"Set or query the memory depth of the oscilloscope (namely the number of waveform points that can be stored in a single trigger sample). The default unit is pts (points).",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  },
+                  {
+                     "param":" 12000"
+                  }
+               ]
+            },
+            {
+               "cmd":":TYPE",
+               "info":"Set or query the acquisition mode of the oscilloscope.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  },
+                  {
+                     "param":" AVER"
+                  },
+                  {
+                     "param":" PEAK"
+                  },
+                  {
+                     "param":" HRES"
+                  },
+                  {
+                     "param":" NORM"
+                  }
+               ]
+            },
+            {
+               "cmd":":SRAT",
+               "info":"Query the current sample rate. The default unit is Sa/s.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "cmd":":CAL",
+         "info":"desc2",
+         "cmd_group_lv2":[
+            {
+               "cmd":":QUIT",
+               "info":"Exit the self-calibration at any time."
+            },
+            {
+               "cmd":":STAR",
+               "info":"The oscilloscope starts to execute self-calibration."
+            }
+         ]
+      },
+      {
+         "cmd":":CHAN",
+         "info":"The :CHANnel<n> commands are used to set or query the vertical system parameters of the analog channels, such as the bandwidth limit, coupling, vertical scale, and vertical offset.",
+         "param_lv1":[
+            {
+               "param":"1"
+            },
+            {
+               "param":"2"
+            },
+            {
+               "param":"3"
+            },
+            {
+               "param":"4"
+            },
+            {
+               "param":"?"
+            }
+         ],
+         "cmd_group_lv2":[
+            {
+               "cmd":":BWL",
+               "info":"Set or query the bandwidth limit parameter of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":"20M"
+                  },
+                  {
+                     "param":"OFF"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":COUP",
+               "info":"Set or query the coupling mode of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":"AC"
+                  },
+                  {
+                     "param":"DC"
+                  },
+                  {
+                     "param":"GND"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":DISP",
+               "info":"Enable or disable the specified channel or query the status of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":" ON"
+                  },
+                  {
+                     "param":" OFF"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":INV",
+               "info":"Enable or disable the waveform invert of the specified channel or query the status of the waveform invert of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":" ON"
+                  },
+                  {
+                     "param":" OFF"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":RANG",
+               "info":"Set or query the vertical range of the specified channel. The default unit is V.",
+               "param_lv2":[
+                  {
+                     "param":" 8"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":TCAL",
+               "info":"Set or query the delay calibration time of the specified channel to calibrate the zero offset of the corresponding channel. The default unit is s.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":SCAL",
+               "info":"Set or query the vertical scale of the specified channel. The default unit is V.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":PROB",
+               "info":"Set or query the probe ratio of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":UNIT",
+               "info":"Set or query the amplitude display unit of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":"WATT"
+                  },
+                  {
+                     "param":"VOLT"
+                  },
+                  {
+                     "param":"AMP"
+                  },
+                  {
+                     "param":"UNKN"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            },
+            {
+               "cmd":":VERN",
+               "info":"Enable or disable the fine adjustment of the vertical scale of the specified channel, or query the fine adjustment status of the vertical scale of the specified channel.",
+               "param_lv2":[
+                  {
+                     "param":"ON"
+                  },
+                  {
+                     "param":"OFF"
+                  },
+                  {
+                     "param":"?"
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "cmd":":DEC",
+         "info":"Turn on or off the decoder or query the status of the decoder",
+         "param_lv1":[
+            {
+               "param":" ON"
+            },
+            {
+               "param":" OFF"
+            },
+            {
+               "param":"?"
+            }
+         ]
+      }
+   ],
+   "entry_point":[
+      {
+         "name":"delay",
+         "info":"Delay next operation by seconds.",
+         "arg_info":"Time in seconds"
+      },
+      {
+         "name":"screen",
+         "info":"Getting print screen from oscilloscope.",
+         "arg_info":"File name"
+      }
+   ]
+}

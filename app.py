@@ -1,13 +1,11 @@
-from flask import render_template, request, send_from_directory
+from flask import render_template, request, send_from_directory, Response
 from flask import Flask
-from playhouse.shortcuts import model_to_dict, dict_to_model
 from datetime import datetime
 from base_interface import *
 from maincore import *
 from system_interface import system_interface
 import json
 import os
-import vxi11
 
 app = Flask(__name__)
 core = maincore()
@@ -16,140 +14,273 @@ system = system_interface()
 @app.route('/api/dev', methods=['POST', 'GET'])
 def add_device():
     if request.method == 'POST':
-        dev = json.loads(request.data)
-        new_dev = Device.create(name=dev["name"],
-                        lan_address=dev["lan_address"])
-        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added".format(new_dev.name))
-    ret = []
+        try:
+            dev = json.loads(request.data)
+        except ValueError as e:
+            Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Decoding JSON has failes by: {}".format(e))
+        else:
+            if 'name' in dev and 'lan_address' in dev:
+                new_dev = Device.create(name=dev["name"], lan_address=dev["lan_address"], status=DevStatusType.Offline.value)
+                Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added".format(new_dev.name))
+            else:
+                Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Device was not added, required fields not exist")
+
+    ret_list = []
     for dev in Device.select():
-        ret.append (dev.get_json())
-    return json.dumps(ret)
+        ret_list.append (dev.get_json())
+    try:
+        return json.dumps(ret_list)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route('/api/dev/<dev_id>', methods=['DELETE'])
+def del_device(dev_id):
+    query = Device.select().where(Device.id == dev_id)
+    if query.exists():
+        dev = query.get()
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was deleted.".format(dev.name))
+        dev.delete_instance()
+    else:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Device not exists.".format(dev.name))
+
+    ret_list = []
+    for dev in Device.select():
+        ret_list.append (dev.get_json())
+    try:
+        return json.dumps(ret_list)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
 
 @app.route('/api/detectDev', methods=['POST'])
 def autodetect_device():
-    list_of_dev = vxi11.list_devices()
-    for dev in list_of_dev:
-        query = Device.select().where(Device.lan_address == dev)
-        if not query.exists():
-            new_dev = Device.create(name="device",
-                lan_address=dev)
-            Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was added by auto-detection".format(new_dev.name))
-    ret = []
-    for dev in Device.select():
-        ret.append (dev.get_json())
-    return json.dumps(ret)
+    # wake detecting device event
+    core.detect = True
+    return 'Detecting LXI devices was runned'
 
+@app.route('/api/checkDev/<devID>', methods=['POST'])
+def check_device_connection(devID):
+    print "check conn"
+    return 'Check connecting to device was runned'
+
+@app.route('/api/results', methods=['GET'])
+def get_results():
+    ret_list = []
+    for res in TaskResp.select().join(Task):
+        ret_list.append (res.get_json())
+    try:
+        return json.dumps(ret_list)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route('/api/results/<resID>', methods=['DELETE'])
+def del_result(resID):
+    query = TaskResp.select().where(TaskResp.id == resID)
+    if query.exists():
+        res = query.get()
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task results from {} was deleted".format(res.task.name, res.datetime_execute))
+        res.delete_instance()
+    ret_list = []
+    for res in TaskResp.select().join(Task):
+        ret_list.append (res.get_json())
+    try:
+        return json.dumps(ret_list)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
 
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():
     cmds = []
     for filename in os.listdir('cmds/'):
-        with open('cmds/'+filename) as cmd_json_data:
-            cmds.append(json.load(cmd_json_data))
-    return json.dumps(cmds)
+        try:
+            file = open('cmds/'+filename)
+        except IOError as e:
+            Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Open {} has failed: {}".format(filename, e))
+        else:
+            with file:
+                try:
+                    cmds.append(json.load(file))
+                except ValueError as e:
+                    Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Decoding JSON has failed by: {}".format(e))
+    try:
+        return json.dumps(cmds)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
 
-@app.route('/api/dev/<dev_id>', methods=['DELETE'])
-def del_device(dev_id):
-    dev = Device.select().where(Device.id == dev_id).get()
-    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} device was deleted".format(dev.name))
-    dev.delete_instance()
-    ret = []
-    for dev in Device.select():
-        ret.append (dev.get_json())
-    return json.dumps(ret)
+@app.route('/api/file', methods=['GET'])
+def get_file():
+    try:
+        return json.dumps(system.get_file_info())
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route('/api/file/<name>', methods=['DELETE'])
+def del_file(name):
+    try:
+        system.remove_file(name)
+    except OSError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="File {} cannot be removed by: {}".format(name, e))
+    try:
+        return json.dumps(system.get_file_info())
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route('/files/<path:path>')
+def send_file(path):
+    return send_from_directory('files', path)
 
 @app.route("/api/logs", methods=['GET', 'DELETE'])
 def get_logs():
     if request.method == 'DELETE':
         query = Log.delete()
-        query.execute()
+        if query.exists():
+            query.execute()
     ret = []
     for log in Log.select():
-        ret.append (log.get_json())
-    return json.dumps(ret) 
+        ret.append(log.get_json())
+    try:
+        return json.dumps(ret) 
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route("/api/sys/info", methods=['GET'])
+def get_sys_info():
+    try:
+        return json.dumps(system.get_system_information())
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
 
 @app.route("/api/ver", methods=['GET'])
 def get_ver():
-    ver = ServerVer.select().get()
-    return json.dumps(ver.get_json())
+    query = ServerVer.select()
+    if query.exists():
+        ver = query.get()
+        try:
+            return json.dumps(ver.get_json())
+        except TypeError as e:
+            Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+            return 'Error, during serialized data', 500
+    else:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during getting data', 500
+
 
 @app.route('/api/task', methods=['POST', 'GET'])
 def add_task():
     if request.method == 'POST':
-        task = json.loads(request.data)
-        new_task = Task(name           = task["name"],
-                        dev            = Device.select().where(Device.id == task["dev"]).get(), 
-                        msg            = task["msg"],
-                        datetime_begin = datetime.strptime(task["datetime_begin"], '%d/%m/%Y %H:%M'))
+        try:
+            task = json.loads(request.data)
+        except ValueError as e:
+            Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Decoding JSON has failes by: {}".format(e))
+        else:
+            if 'name' in task and 'dev' in task and 'msg' in task:
+                query = Device.select().where(Device.id == task["dev"])
+                if query.exists():
+                    dev = query.get()
+                    new_task = Task(name = task["name"],
+                                    dev  = dev, 
+                                    msg  = task["msg"])
 
-        if 'datetime_end' in task:
-            new_task.datetime_end = datetime.strptime(task["datetime_end"], '%d/%m/%Y %H:%M')
+                    if 'datetime_begin' in task:
+                        new_task.datetime_begin = datetime.strptime(task["datetime_begin"], '%d/%m/%Y %H:%M:%S')
+                        new_task.datetime_next = new_task.datetime_begin
 
-        if 'series' in task:
-            new_task.series = task['series']
+                    if 'now' in task:
+                        if task['now'] == True:
+                            new_task.datetime_begin = datetime.now()
+                            new_task.datetime_next = new_task.datetime_begin
 
-        new_task.datetime_next = new_task.datetime_begin
-        new_task.save()
-        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was added".format(new_task.name))
+                    if 'datetime_end' in task:
+                        new_task.datetime_end = datetime.strptime(task["datetime_end"], '%d/%m/%Y %H:%M:%S')
+
+                    if 'series' in task:
+                        new_task.series   = task['series']
+                        if 'cron_str' in task: 
+                            new_task.cron_str = task['cron_str']
+
+                    new_task.save()
+                    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was added".format(new_task.name))
+                else:
+                     Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Task was not added, desired device is not exist")
+            else:
+                Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Task was not added, required fields not exist")
+
     ret = []
     for task in Task.select():
         ret.append(task.get_json())
-    return json.dumps(ret) 
+    try:
+        return json.dumps(ret)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
 
 @app.route('/api/task/<task_id>', methods=['DELETE'])
 def del_task(task_id):
-    task = Task.select().where(Task.id == task_id).get()
-    Log.create(source=LogSourceType.SERVER.value, types=LogType.Info.value, msg="{} task was deleted".format(task.name))
-    task.delete_instance()
+    query = Task.select().where(Task.id == task_id)
+    if query.exists():
+        task = query.get()
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was deleted".format(task.name))
+        task.delete_instance()
+    else:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Task id:{} does not exist".format(task_id))
+    
     ret = []
     for task in Task.select():
         ret.append(task.get_json())
-    return json.dumps(ret) 
+    try:
+        return json.dumps(ret)
+    except TypeError as e:
+        Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Unable to serialize the object:{}".format(e))
+        return 'Error, during serialized data', 500
+
+@app.route('/api/stopTask/<taskID>', methods=['POST'])
+def stop_task(taskID):
+    print "stop task"
+    return 'Task was stoped'
+
+@app.route('/api/executeTask/<taskID>', methods=['POST'])
+def executeTask(taskID):
+    print "execute now"
+    return 'Task was runned manualy'
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/api/sys/info", methods=['GET'])
-def get_sys_info(): 
-    return system.get_system_information()
-
-@app.after_request
-def after_request(response):
-    if request.method != 'GET':
-        ver = ServerVer.select().get()
-        ver.inc_runtime()
-    return response
-
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-
 @app.route('/api/sys/shutdown', methods=['POST'])
 def shutdown():
-    shutdown_server()
     core.exit_signal = True
     core.join()
-    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is down")  
+    Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is down")
     base.close()
     return 'Server shutting down...'
 
-@app.route('/files/<path:path>')
-def send_html(path):
-    print path
-    print "download"
-    return send_from_directory('files', path)
+@app.after_request
+def inc_server_ver(response):
+    if request.method != 'GET':
+        query = ServerVer.select()
+        if query.exists():
+            query.get().inc_runtime()
+    return response
 
 def main():
     base.connect()
-    base.create_tables([Device, Task, Log, ServerVer, TaskRep])
+    base.create_tables([Device, Task, Log, ServerVer, TaskResp])
     Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Server is up")
-    ver = ServerVer.create(major=1, minor=0, runtime=0)
+
+    query = ServerVer.select()
+    if not query.exists():
+        ServerVer.create(major=1, minor=0, runtime=0)
     core.start()
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
 
 if __name__ == "__main__":
     main()
-

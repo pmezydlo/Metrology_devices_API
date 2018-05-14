@@ -13,7 +13,8 @@
                             <th>Device</th>
                             <th>Serial number</th>
                             <th>Firmware version</th>
-                            <th>Online</th>
+                            <th>Status</th>
+                            <th></th>
                             <th></th>
                         </tr> 
                     </thead>
@@ -26,8 +27,9 @@
                             <td> {{dev.device}}</td>
                             <td> {{dev.serial_num}}</td>
                             <td> {{dev.firm_ver}}</td>
-                            <td> {{dev.online}}</td>
+                            <td> {{dev.status}}</td>
                             <td><button class="btn btn-danger" type="submit" ng-click="deleteDev(dev.id)">Delete</button></td>
+                            <td><button class="btn btn-info" type="submit" ng-click="checkDev(dev.id)">Check connection</button></td>
                         </tr>
                     </tbody>
                 </table>
