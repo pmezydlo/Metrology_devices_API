@@ -116,9 +116,8 @@ class Task(BaseModel):
         if self.status == TaskStatusType.Pending.value:
             if self.datetime_next is not None:
                 if self.datetime_next < datetime.now():
-                    if self.series == True:
-                        iter  = croniter(self.cron_str, self.datetime_next) 
-                        self.datetime_next = iter.get_next(datetime)
+                    if self.series:
+                        self.datetime_next = croniter(self.cron_str, self.datetime_next).get_next(datetime)
                         return True
                     else:
                         return True
@@ -133,7 +132,7 @@ class Task(BaseModel):
         if state == TaskStatusType.Run.value:
             self.status = TaskStatusType.Run.value
         elif state == TaskStatusType.Ready.value:
-            if self.series == False:
+            if not self.series:
                 self.status = TaskStatusType.Ready.value
             else:
                 if self.datetime_end < self.datetime_next:

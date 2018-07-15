@@ -1,5 +1,3 @@
-import sys
-import json
 import datetime
 import platform
 import psutil
@@ -43,7 +41,7 @@ class system_interface(object):
         freq  = psutil.cpu_freq(percpu=True)
         cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
 
-        for i in xrange(psutil.cpu_count()):
+        for i in range(psutil.cpu_count()):
             number.append("Cpu"+str(i))
             freq_curr.append(str(freq[i].current)+"MHz")
             freq_min.append(str(freq[i].min)+"MHz")
