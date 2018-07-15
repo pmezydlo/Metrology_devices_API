@@ -40,12 +40,12 @@ class system_interface(object):
 
         freq  = psutil.cpu_freq(percpu=True)
         cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
-
         for i in range(psutil.cpu_count()):
             number.append("Cpu"+str(i))
-            freq_curr.append(str(freq[i].current)+"MHz")
-            freq_min.append(str(freq[i].min)+"MHz")
-            freq_max.append(str(freq[i].max)+"MHz")
+            if i < len(freq): # workaround: number of cpu frequency array is not align to cpu count
+                freq_curr.append(str(freq[i].current)+"MHz")
+                freq_min.append(str(freq[i].min)+"MHz")
+                freq_max.append(str(freq[i].max)+"MHz")
             usage.append(cpu_usage[i])
 
         return [{"cpu": cpu, "usage": usage, "min": min, "max": max, "cur": cur} for cpu, usage, min, max, cur in zip(number, usage, freq_min, freq_max, freq_curr)]

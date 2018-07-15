@@ -15,7 +15,7 @@ system = system_interface()
 def add_device():
     if request.method == 'POST':
         try:
-            dev = json.loads(request.data)
+            dev = json.loads(request.data.decode('utf-8'))
         except ValueError as e:
             Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Decoding JSON has failes by: {}".format(e))
         else:
@@ -176,7 +176,7 @@ def get_ver():
 def add_task():
     if request.method == 'POST':
         try:
-            task = json.loads(request.data)
+            task = json.loads(request.data.decode('utf-8'))
         except ValueError as e:
             Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Decoding JSON has failes by: {}".format(e))
         else:
