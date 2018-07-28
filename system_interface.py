@@ -1,8 +1,27 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''
+
+'''
+
+__author__ = "Patryk Mezydlo"
+__copyright__ = "Copyright 2018, Metrology Device API"
+__credits__ = ["Patryk Mezydlo"]
+__license__ = "GPL"
+__version__ = "1.0"
+__maintainer__ = "Patryk Mezydlo"
+__email__ = "mezydlo.p@gmail.com"
+__status__ = "Development"
+
 import datetime
 import platform
 import psutil
 import os
 import time
+from common_const import common_const
+
+const = common_const()
 
 class system_interface(object):
     def __init__ (self):
@@ -20,14 +39,14 @@ class system_interface(object):
         return "%sB" % n
 
     def remove_file(self, name):
-        os.remove("files/"+name)
+        os.remove(const.FILES_PATH + name)
 
     def get_file_info(self):
         ret_file = []
         ret_size = []
-        for file in os.listdir("files/"):
+        for file in os.listdir(const.FILES_PATH):
             ret_file.append(file)
-            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join("files/", file))))
+            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(settings.FILES_PATH, file))))
         ret = [{"name": f, "size": s} for f, s in zip(ret_file, ret_size)]
         return ret
 

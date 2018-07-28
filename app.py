@@ -1,15 +1,33 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''
+
+'''
+
+__author__ = "Patryk Mezydlo"
+__copyright__ = "Copyright 2018, Metrology Device API"
+__credits__ = ["Patryk Mezydlo"]
+__license__ = "GPL"
+__version__ = "1.0"
+__maintainer__ = "Patryk Mezydlo"
+__email__ = "mezydlo.p@gmail.com"
+__status__ = "Development"
+
 from flask import render_template, request, send_from_directory, Response
 from flask import Flask
 from datetime import datetime
 from base_interface import *
 from maincore import *
 from system_interface import system_interface
+from common_const import common_const 
 import json
 import os
 
 app = Flask(__name__)
 core = maincore()
 system = system_interface()
+const = common_const()
 
 @app.route('/api/dev', methods=['POST', 'GET'])
 def add_device():
@@ -94,9 +112,9 @@ def del_result(resID):
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():
     cmds = []
-    for filename in os.listdir('cmds/'):
+    for filename in os.listdir(const.CMDS_PATH):
         try:
-            file = open('cmds/'+filename) # TODO: Predefined global path
+            file = open(const.CMDS_PATH+filename)
         except IOError as e:
             Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Open {} has failed: {}".format(filename, e))
         else:
