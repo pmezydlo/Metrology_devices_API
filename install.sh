@@ -9,4 +9,6 @@ mkdir files
 crontab -l > cronscript
 echo "@reboot sh $PWD/launcher.sh > $PWD/files/cronlog 2>&1" >> cronscript
 crontab cronscript
-rm scronscript
+rm cronscript
+
+

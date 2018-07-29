@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python $PWD/app.py
+python3 'dirname "$0"/app.py'

@@ -112,9 +112,9 @@ def del_result(resID):
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():
     cmds = []
-    for filename in os.listdir(const.CMDS_PATH):
+    for filename in os.listdir(str(const.CMDS_PATH())):
         try:
-            file = open(const.CMDS_PATH+filename)
+            file = open(str(const.CMDS_PATH())+filename)
         except IOError as e:
             Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Open {} has failed: {}".format(filename, e))
         else:

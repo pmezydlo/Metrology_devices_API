@@ -44,9 +44,9 @@ class system_interface(object):
     def get_file_info(self):
         ret_file = []
         ret_size = []
-        for file in os.listdir(const.FILES_PATH):
+        for file in os.listdir(const.FILES_PATH()):
             ret_file.append(file)
-            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(settings.FILES_PATH, file))))
+            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(settings.FILES_PATH(), file))))
         ret = [{"name": f, "size": s} for f, s in zip(ret_file, ret_size)]
         return ret
 

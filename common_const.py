@@ -15,7 +15,7 @@ __email__ = "mezydlo.p@gmail.com"
 __status__ = "Development"
 
 class common_const(object):
-    def CMDS_PATH():
-        return 'cmds/'
-    def FILES_PATH():
-        return 'files/'
+    def CMDS_PATH(self):
+        return "cmds/"
+    def FILES_PATH(self):
+        return "files/"
