@@ -6,3 +6,8 @@ unzip master.zip
 cd python-vxi11-master/
 python3 setup.py install
 mkdir files
+
+crontab -l cronscript
+echo "@reboot sh $PWD/launcher.sh > $PWD/files/cronlog 2>&1" >> cronscript
+crontab cronscript
+rm scronscript
