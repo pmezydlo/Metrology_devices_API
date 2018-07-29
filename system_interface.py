@@ -27,6 +27,9 @@ class system_interface(object):
     def __init__ (self):
         pass
 
+    def get_path(self):
+        return os.path.dirname(os.path.realpath(__file__))+"/"
+
     def bytes_2_human_readable(self, n):
         symbols = ('KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
         prefix = {}
@@ -39,14 +42,14 @@ class system_interface(object):
         return "%sB" % n
 
     def remove_file(self, name):
-        os.remove(const.FILES_PATH + name)
+        os.remove(const.FILES_PATH() + name)
 
     def get_file_info(self):
         ret_file = []
         ret_size = []
-        for file in os.listdir(const.FILES_PATH()):
+        for file in os.listdir(self.get_path()+const.FILES_PATH()):
             ret_file.append(file)
-            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(settings.FILES_PATH(), file))))
+            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(self.get_path()+const.FILES_PATH(), file))))
         ret = [{"name": f, "size": s} for f, s in zip(ret_file, ret_size)]
         return ret
 
