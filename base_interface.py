@@ -19,8 +19,12 @@ from enum import Enum
 from datetime import datetime
 from croniter import croniter
 import json
+from system_interface import system_interface
+from common_const import *
 
-base = SqliteDatabase('MDA.db')
+system = system_interface()
+
+base = SqliteDatabase(system.get_path()+BASE_PATH()+BASE_NAME())
 
 class LogType(Enum):
     Info    = 0

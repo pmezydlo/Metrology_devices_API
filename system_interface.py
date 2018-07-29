@@ -19,16 +19,14 @@ import platform
 import psutil
 import os
 import time
-from common_const import common_const
-
-const = common_const()
+from common_const import *
 
 class system_interface(object):
     def __init__ (self):
         pass
 
     def get_path(self):
-        return os.path.dirname(os.path.realpath(__file__))+"/"
+        return str(os.path.dirname(os.path.realpath(__file__)))+"/"
 
     def bytes_2_human_readable(self, n):
         symbols = ('KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
@@ -47,9 +45,9 @@ class system_interface(object):
     def get_file_info(self):
         ret_file = []
         ret_size = []
-        for file in os.listdir(self.get_path()+const.FILES_PATH()):
+        for file in os.listdir(self.get_path()+FILES_PATH()):
             ret_file.append(file)
-            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(self.get_path()+const.FILES_PATH(), file))))
+            ret_size.append(self.bytes_2_human_readable(os.path.getsize(os.path.join(self.get_path()+FILES_PATH(), file))))
         ret = [{"name": f, "size": s} for f, s in zip(ret_file, ret_size)]
         return ret
 

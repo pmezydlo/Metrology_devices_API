@@ -20,14 +20,15 @@ from datetime import datetime
 from base_interface import *
 from maincore import *
 from system_interface import system_interface
-from common_const import common_const 
+from common_const import *
 import json
 import os
 
 app = Flask(__name__)
 core = maincore()
 system = system_interface()
-const = common_const()
+system = system_interface()
+
 
 @app.route('/api/dev', methods=['POST', 'GET'])
 def add_device():
@@ -112,9 +113,9 @@ def del_result(resID):
 @app.route('/api/cmds', methods=['GET'])
 def get_cmds():
     cmds = []
-    for filename in os.listdir(system.get_path()+const.CMDS_PATH()):
+    for filename in os.listdir(system.get_path()+CMDS_PATH()):
         try:
-            file = open(system.get_path()+const.CMDS_PATH()+filename)
+            file = open(system.get_path()+CMDS_PATH()+filename)
         except IOError as e:
             Log.create(source=LogSourceType.Server.value, types=LogType.Error.value, msg="Open {} has failed: {}".format(filename, e))
         else:
