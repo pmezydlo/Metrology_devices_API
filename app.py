@@ -27,8 +27,6 @@ import os
 app = Flask(__name__)
 core = maincore()
 system = system_interface()
-system = system_interface()
-
 
 @app.route('/api/dev', methods=['POST', 'GET'])
 def add_device():
@@ -262,6 +260,7 @@ def del_task(task_id):
 @app.route('/api/stopTask/<taskID>', methods=['POST'])
 def stop_task(taskID):
     #print "stop task" # TODO: add support for stoping path
+
     return 'Task was stoped'
 
 @app.route('/api/executeTask/<taskID>', methods=['POST'])

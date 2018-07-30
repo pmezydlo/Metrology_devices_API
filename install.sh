@@ -1,5 +1,5 @@
 #!/bin/bash
-apt-get install python3 python3-dev python3-pip
+apt-get install python3 python3-dev python3-pip cron
 pip3 install -r requirements.txt
 wget https://github.com/python-ivi/python-vxi11/archive/master.zip
 unzip master.zip
