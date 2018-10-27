@@ -15,11 +15,11 @@ __email__ = "mezydlo.p@gmail.com"
 __status__ = "Development"
 
 def CMDS_PATH():
-    return "cmds/"
+    return 'cmds/'
 def FILES_PATH():
-    return "files/"
+    return 'files/'
 def BASE_PATH():
-    return "./"
+    return './'
 def BASE_NAME():
-    return "MDA.bd"
+    return 'MDA.db'
 

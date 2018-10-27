@@ -40,9 +40,10 @@ class LogSourceType(Enum):
 
 class TaskStatusType(Enum):
     Pending = 0
-    Run     = 1
-    Ready   = 2
-    Error   = 3
+    Now     = 1
+    Run     = 2
+    Ready   = 3
+    Error   = 4
 
 class TaskRespStatusType(Enum):
     Success = 0
@@ -99,9 +100,9 @@ class Device(BaseModel):
            self.save()
            ServerVer.select().get().inc_runtime()
 
-    def update_online(self, online):
-        if self.online != online:
-            self.online = online
+    def update_status(self, new_status):
+        if self.status != new_status:
+            self.status = new_status
             self.save()
             ver = ServerVer.select().get()
             ver.inc_runtime()
@@ -130,11 +131,14 @@ class Task(BaseModel):
     series         = BooleanField(default=False)
 
     def ready_to_execute(self):
+        if self.status == TaskStatusType.Now.value:
+            print("ready to execute now")
+            return True
         if self.status == TaskStatusType.Pending.value:
             if self.datetime_next is not None:
                 if self.datetime_next < datetime.now():
                     if self.series:
-                        self.datetime_next = croniter(self.cron_str, self.datetime_next).get_next(datetime)
+                        self.datetime_next = croniter(self.cron_str, datetime.now()).get_next(datetime)
                         return True
                     else:
                         return True
@@ -146,7 +150,9 @@ class Task(BaseModel):
             return False
 
     def update_status(self, state):
-        if state == TaskStatusType.Run.value:
+        if state == TaskStatusType.Now.value:
+            self.status = TaskStatusType.Now.value
+        elif state == TaskStatusType.Run.value:
             self.status = TaskStatusType.Run.value
         elif state == TaskStatusType.Ready.value:
             if not self.series:
@@ -167,7 +173,7 @@ class Task(BaseModel):
         ret['dev']            = self.dev.id
         if self.datetime_begin is not None:
             ret['datetime_begin'] = self.datetime_begin.strftime("%d/%m/%Y %H:%M:%S")
-        if self.series:
+        if self.series and self.datetime_end is not None:
             ret['datetime_end']   = self.datetime_end.strftime("%d/%m/%Y %H:%M:%S")
         ret['cron_str']       = self.cron_str
         ret['status']         = TaskStatusType(self.status).name

@@ -15,16 +15,17 @@ __email__ = "mezydlo.p@gmail.com"
 __status__ = "Development"
 
 import time
+from common_const import *
 
 def delay(dev, args):
     time.sleep(int(args))
     return 'ok'
 
 def screen(dev, args):
-    dev.write(":DISP:DATA?")
+    dev.write(':DISP:DATA?')
     bmp_data = dev.read_raw()[2+9:]
 
-    with open("files/"+args, "wb") as f:
+    with open(FILES_PATH()+args, "wb") as f:
         f.write(bmp_data)
     return 'Saved'
 

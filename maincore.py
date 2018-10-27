@@ -34,7 +34,6 @@ class task_core(threading.Thread):
         self.instr = vxi11.Instrument(self.dev.lan_address)
         self.ret_msg = []
         self.ret_res = []
-
         self.status = TaskRespStatusType.Success
 
     def run(self):
@@ -91,19 +90,23 @@ class task_core(threading.Thread):
         def check_connection():
             try:
                 self.instr.ask("*OPC?")
+                self.task.dev.update_status(DevStatusType.Busy.value)             
                 return True
             except vxi11.vxi11.Vxi11Exception as e:
                 self.status = TaskRespStatusType.Timeout
+                self.task.dev.update_status(DevStatusType.Offline.value)
                 return False
             except socket.error as e:
                 self.status = TaskRespStatusType.Error
+                self.task.dev.update_status(DevStatusType.Error.value)
                 return False
 
     #    print "execute"
     #    print(self.task.name)
         if check_connection():
             execute_cmds()
-        
+            self.task.dev.update_status(DevStatusType.Online.value)
+     
         self.response = [{"msg": m, "resp": r} for m, r in zip(self.ret_msg, self.ret_res)]
         self.end_flag = True
         
@@ -113,16 +116,25 @@ class maincore(threading.Thread):
         self.exit_signal = False
         self.tasks_thread_list = []
         self.detect = False
+        self.check_conn = False
+        self.dev_id     = 0
 
     def run(self):
-#        def get_devices_status():
-#            for dev in Device.select():
-#                try:
-#                    dev.update_info(self.instr.ask("*IDN?"))
-#                except:
-#                    dev.update_online(False)
-#                else:
-#                    dev.update_online(True)
+        def check_dev_connection():
+            print("check_dev_connection - start")
+            query = Device.select().where(Device.id == self.dev_id)
+            if query:
+                dev = query.get()
+                instr = vxi11.Instrument(dev.lan_address)
+            try:
+                Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="Connection with {} device checking was started".format(dev.name))
+                instr.ask("*OPC?")
+            except vxi11.vxi11.Vxi11Exception as e:
+                dev.update_status(DevStatusType.Error.value)
+            except socket.error as e:
+                dev.update_status(DevStatusType.Offline.value)
+            else:
+                dev.update_status(DevStatusType.Online.value)
 
         def get_device_info(dev):
             instr = vxi11.Instrument(dev.lan_address)
@@ -144,6 +156,8 @@ class maincore(threading.Thread):
             for task in self.tasks_thread_list:
                 if task.end_flag:
                     task.task.update_status(TaskStatusType.Ready.value)
+
+
                #     print "task was released"
                     resp = TaskResp.create(resp=json.dumps(task.response), task=task.task, status=task.status.value)
               #      print resp.resp
@@ -155,8 +169,10 @@ class maincore(threading.Thread):
         def get_tasks_to_execute():
             for task in Task.select():
                 if task.ready_to_execute():
+                    print("get_tasks_to_execute()")
                     task.update_status(TaskStatusType.Run.value)
                     task_thread = task_core(task, task.dev)
+                    task.dev.update_status(DevStatusType.Busy.value)
                     self.tasks_thread_list.append(task_thread)
                     task_thread.start()
                     Log.create(source=LogSourceType.Core.value, types=LogType.Info.value, msg=task.name+" task has began")
@@ -169,5 +185,8 @@ class maincore(threading.Thread):
             if self.detect:
                 self.detect = False
                 detect_devices()
+            if self.check_conn:
+                self.check_conn = False
+                check_dev_connection()
 
         Log.create(source=LogSourceType.Core.value, types=LogType.Info.value, msg="Core is down")

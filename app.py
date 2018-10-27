@@ -77,8 +77,10 @@ def autodetect_device():
     return 'Detecting LXI devices was runned'
 
 @app.route('/api/checkDev/<devID>', methods=['POST'])
-def check_device_connection(devID): # TODO: add suport for checking connection 
-    #print "check conn"
+def check_device_connection(devID): 
+    print("check conn")
+    core.dev_id = devID
+    core.check_conn = True
     return 'Check connecting to device was runned'
 
 @app.route('/api/results', methods=['GET'])
@@ -150,7 +152,7 @@ def del_file(name):
 
 @app.route('/files/<path:path>')
 def send_file(path):
-    return send_from_directory('files', path)
+    return send_from_directory(FILES_PATH(), path)
 
 @app.route("/api/logs", methods=['GET', 'DELETE'])
 def get_logs():
@@ -259,13 +261,26 @@ def del_task(task_id):
 
 @app.route('/api/stopTask/<taskID>', methods=['POST'])
 def stop_task(taskID):
-    #print "stop task" # TODO: add support for stoping path
-
-    return 'Task was stoped'
+    query = Task.select().where(Task.id == taskID)
+    if query:
+        task = query.get()
+        task.status = TaskStatusType.Ready.value
+        task.save()
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was moved to ready status".format(task.name))
+        ver = ServerVer.select().get()
+        ver.inc_runtime()
+        return 'Task was stoped'
+    return 'Error, during stoped task', 500
 
 @app.route('/api/executeTask/<taskID>', methods=['POST'])
-def executeTask(taskID): # TODO: add support for executing task manualy
-    #print "execute now"
+def executeTask(taskID):
+    query = Task.select().where(Task.id == taskID)
+    if query:
+        task = query.get()
+        task.update_status(TaskStatusType.Now.value) 
+        Log.create(source=LogSourceType.Server.value, types=LogType.Info.value, msg="{} task was executed manualy".format(task.name))
+        ver = ServerVer.select().get()
+        ver.inc_runtime()
     return 'Task was runned manualy'
 
 @app.route("/")

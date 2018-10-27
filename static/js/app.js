@@ -255,6 +255,26 @@ myApp.controller('mainController', ($scope, $http, $timeout) => {
         });
     };
 
+    $scope.stopTask = (taskID) => {
+        $http.post('/api/stopTask/' + taskID)
+        .success((data) => {
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
+    $scope.executeTask = (taskID) => {
+        $http.post('/api/executeTask/' + taskID)
+        .success((data) => {
+            console.log(data);
+        })
+        .error((error) => {
+            console.log('Error: ' + error);
+        });
+    };
+
     $scope.sysStop = () => {
         $http.post('/api/sys/stop')
         .success((data) => {
